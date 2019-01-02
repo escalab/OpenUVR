@@ -1,8 +1,8 @@
-#ifndef OWVR_TCP_H
-#define OWVR_TCP_H
+#ifndef OUVR_TCP_H
+#define OUVR_TCP_H
 
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
-struct owvr_network tcp_handler;
+struct ouvr_network tcp_handler;
 
 #endif

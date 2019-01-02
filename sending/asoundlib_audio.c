@@ -1,7 +1,7 @@
 #include "alsa/asoundlib.h"
 
 #include "asoundlib_audio.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
 typedef struct asoundlib_audio_context
 {
@@ -9,7 +9,7 @@ typedef struct asoundlib_audio_context
     int buf_size;
 } asoundlib_audio_context;
 
-static int asoundlib_initialize(struct owvr_ctx *ctx)
+static int asoundlib_initialize(struct ouvr_ctx *ctx)
 {
     int ret;
     if (ctx->aud_priv != NULL)
@@ -93,7 +93,7 @@ static int asoundlib_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-static int asoundlib_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int asoundlib_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     int ret;
     asoundlib_audio_context *a = ctx->aud_priv;
@@ -107,7 +107,7 @@ static int asoundlib_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt
 
     return 1;
 }
-static void asoundlib_deinitialize(struct owvr_ctx *ctx)
+static void asoundlib_deinitialize(struct ouvr_ctx *ctx)
 {
     asoundlib_audio_context *a = ctx->aud_priv;
     snd_pcm_close(a->alsa_ctx);
@@ -115,7 +115,7 @@ static void asoundlib_deinitialize(struct owvr_ctx *ctx)
     ctx->aud_priv = NULL;
 }
 
-struct owvr_audio asoundlib_audio = {
+struct ouvr_audio asoundlib_audio = {
     .init = asoundlib_initialize,
     .encode_frame = asoundlib_process_frame,
     .deinit = asoundlib_deinitialize,

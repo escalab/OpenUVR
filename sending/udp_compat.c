@@ -1,5 +1,5 @@
 #include "udp.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,7 +26,7 @@ typedef struct udp_compat_net_context
     struct iovec iov[3];
 } udp_compat_net_context;
 
-static int udp_initialize(struct owvr_ctx *ctx)
+static int udp_initialize(struct ouvr_ctx *ctx)
 {
     if (ctx->net_priv != NULL)
     {
@@ -67,7 +67,7 @@ static int udp_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-static int udp_send_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int udp_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     udp_compat_net_context *c = ctx->net_priv;
     register ssize_t r;
@@ -95,7 +95,7 @@ static int udp_send_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
     return 0;
 }
 
-struct owvr_network udp_compat_handler = {
+struct ouvr_network udp_compat_handler = {
     .init = udp_initialize,
     .send_packet = udp_send_packet,
 };

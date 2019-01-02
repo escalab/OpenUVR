@@ -5,7 +5,7 @@
 #include "include/libswscale/swscale.h"
 
 #include "ffmpeg_encode.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -26,7 +26,7 @@ static int const srcstride[1] = {WIDTH * 3};
 static int const srcstride[1] = {WIDTH * 4};
 #endif
 
-static int ffmpeg_initialize(struct owvr_ctx *ctx)
+static int ffmpeg_initialize(struct ouvr_ctx *ctx)
 {
     int ret;
     if (ctx->enc_priv != NULL)
@@ -93,7 +93,7 @@ static int ffmpeg_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-static int ffmpeg_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     int ret;
     ffmpeg_encode_context *e = ctx->enc_priv;
@@ -144,13 +144,13 @@ static int ffmpeg_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
 
     return 0;
 }
-static void ffmpeg_deinitialize(struct owvr_ctx *ctx)
+static void ffmpeg_deinitialize(struct ouvr_ctx *ctx)
 {
     void *fdsa = ctx;
     printf("fdsa %p\n", fdsa);
 }
 
-struct owvr_encoder ffmpeg_encode = {
+struct ouvr_encoder ffmpeg_encode = {
     .init = ffmpeg_initialize,
     .process_frame = ffmpeg_process_frame,
     .deinit = ffmpeg_deinitialize,

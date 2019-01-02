@@ -1,5 +1,5 @@
 #include "udp.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -29,7 +29,7 @@ typedef struct feedback_net_context
 
 static feedback_net_context fb_net;
 
-int feedback_initialize(struct owvr_ctx *ctx)
+int feedback_initialize(struct ouvr_ctx *ctx)
 {
     feedback_net_context *c = &fb_net;
 
@@ -66,7 +66,7 @@ int feedback_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-int feedback_receive(struct owvr_ctx *ctx)
+int feedback_receive(struct ouvr_ctx *ctx)
 {
     feedback_net_context *c = &fb_net;
     register ssize_t r;

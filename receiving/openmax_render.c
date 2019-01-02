@@ -1,4 +1,4 @@
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include "openmax_render.h"
 #include <stdio.h>
 #include <time.h>
@@ -42,7 +42,7 @@ static int start_times[NUM_BUFS] = {0};
 
 static struct timespec sleep_time = {.tv_sec = 0, .tv_nsec = 100000000};
 
-static int omxr_initialize(struct owvr_ctx *ctx)
+static int omxr_initialize(struct ouvr_ctx *ctx)
 {
     // pthread_mutex_init(&decode_lock, NULL);
     // pthread_cond_init(&decode_cond, NULL);
@@ -278,7 +278,7 @@ static int allocate_decoder_input_buffers()
 // OMX_SetupTunnel(handleOutput, nPortOutput, handleInput, nPortInput);
 
 static int buf_idx = 0;
-static int omxr_process_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int omxr_process_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     OMX_ERRORTYPE err;
     unsigned int remaining_bytes = (unsigned int)pkt->size;
@@ -383,7 +383,7 @@ static void omxr_deinitialize()
     bcm_host_deinit();
 }
 
-struct owvr_decoder openmax_render = {
+struct ouvr_decoder openmax_render = {
     .init = omxr_initialize,
     .process_frame = omxr_process_packet,
     .deinit = omxr_deinitialize,

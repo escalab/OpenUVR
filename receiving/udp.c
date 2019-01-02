@@ -1,5 +1,5 @@
 #include "udp.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -30,7 +30,7 @@ typedef struct udp_net_context
     struct iovec iov[3];
 } udp_net_context;
 
-static int udp_initialize(struct owvr_ctx *ctx)
+static int udp_initialize(struct ouvr_ctx *ctx)
 {
     if (ctx->net_priv != NULL)
     {
@@ -73,7 +73,7 @@ static int udp_initialize(struct owvr_ctx *ctx)
     static float avg_time = 0;
 #endif
 
-static int udp_receive_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int udp_receive_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
 #ifdef TIME_NETWORK
     struct timeval start_time, end_time;
@@ -139,7 +139,7 @@ static int udp_receive_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
     return 0;
 }
 
-struct owvr_network udp_handler = {
+struct ouvr_network udp_handler = {
     .init = udp_initialize,
     .recv_packet = udp_receive_packet,
 };

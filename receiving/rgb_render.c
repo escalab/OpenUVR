@@ -1,4 +1,4 @@
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include "rgb_render.h"
 #include <stdio.h>
 #include <time.h>
@@ -47,7 +47,7 @@ static OMX_BUFFERHEADERTYPE *omx_buffer[NUM_BUFS] = {0};
 
 static struct timespec sleep_time = {.tv_sec = 0, .tv_nsec = 100000000};
 
-static int rgb_initialize(struct owvr_ctx *ctx)
+static int rgb_initialize(struct ouvr_ctx *ctx)
 {
     // pthread_mutex_init(&decode_lock, NULL);
     // pthread_cond_init(&decode_cond, NULL);
@@ -212,7 +212,7 @@ static int allocate_decoder_input_buffers()
 // OMX_SetupTunnel(handleOutput, nPortOutput, handleInput, nPortInput);
 
 static int buf_idx = 0;
-static int rgb_process_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int rgb_process_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     OMX_ERRORTYPE err;
     unsigned int remaining_bytes = (unsigned int)pkt->size;
@@ -284,7 +284,7 @@ static void rgb_deinitialize()
     bcm_host_deinit();
 }
 
-struct owvr_decoder rgb_render = {
+struct ouvr_decoder rgb_render = {
     .init = rgb_initialize,
     .process_frame = rgb_process_packet,
     .deinit = rgb_deinitialize,

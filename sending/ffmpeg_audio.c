@@ -7,7 +7,7 @@
 #include "alsa/asoundlib.h"
 
 #include "ffmpeg_encode.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
 typedef struct ffmpeg_audio_context
 {
@@ -17,7 +17,7 @@ typedef struct ffmpeg_audio_context
     int idx;
 } ffmpeg_audio_context;
 
-static int ffmpeg_initialize(struct owvr_ctx *ctx)
+static int ffmpeg_initialize(struct ouvr_ctx *ctx)
 {
     int ret;
     if (ctx->aud_priv != NULL)
@@ -95,7 +95,7 @@ static int ffmpeg_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-static int ffmpeg_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     int ret;
     ffmpeg_audio_context *a = ctx->aud_priv;
@@ -164,13 +164,13 @@ static int ffmpeg_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
 
     return 0;
 }
-static void ffmpeg_deinitialize(struct owvr_ctx *ctx)
+static void ffmpeg_deinitialize(struct ouvr_ctx *ctx)
 {
     void *fdsa = ctx;
     printf("fdsa %p\n", fdsa);
 }
 
-struct owvr_audio ffmpeg_audio = {
+struct ouvr_audio ffmpeg_audio = {
     .init = ffmpeg_initialize,
     .encode_frame = ffmpeg_process_frame,
     .deinit = ffmpeg_deinitialize,

@@ -1,9 +1,9 @@
-#ifndef OWVR_FBNET_H
-#define OWVR_FBNET_H
+#ifndef OUVR_FBNET_H
+#define OUVR_FBNET_H
 
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
-int feedback_initialize(struct owvr_ctx *ctx);
-int feedback_receive(struct owvr_ctx *ctx);
+int feedback_initialize(struct ouvr_ctx *ctx);
+int feedback_receive(struct ouvr_ctx *ctx);
 
 #endif

@@ -11,7 +11,7 @@
 #include <linux/input.h>
 #include <pthread.h>
 
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
 #define SERVER_PORT_MOUSE 9000
 #define CLIENT_PORT_MOUSE 9001

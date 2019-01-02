@@ -1,5 +1,5 @@
 #include "udp.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -31,7 +31,7 @@ typedef struct raw_net_context
 
 unsigned char const global_eth_header[14] = {0xb8, 0x27, 0xeb, 0x6c, 0xa7, 0xdd, 0x00, 0x0e, 0x8e, 0x5c, 0x2e, 0x53, 0x88, 0xb5};
 
-static int raw_initialize(struct owvr_ctx *ctx)
+static int raw_initialize(struct ouvr_ctx *ctx)
 {
     if (ctx->net_priv != NULL)
     {
@@ -73,7 +73,7 @@ static int raw_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-static int raw_send_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int raw_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     raw_net_context *c = ctx->net_priv;
     register ssize_t r;
@@ -103,14 +103,14 @@ static int raw_send_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
     return 0;
 }
 
-static int raw_deinitialize(struct owvr_ctx *ctx)
+static int raw_deinitialize(struct ouvr_ctx *ctx)
 {
     raw_net_context *c = ctx->net_priv;
     close(c->fd);
     free(ctx->net_priv);
 }
 
-struct owvr_network raw_handler = {
+struct ouvr_network raw_handler = {
     .init = raw_initialize,
     .send_packet = raw_send_packet,
     .deinit = raw_deinitialize,

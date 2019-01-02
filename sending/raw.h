@@ -1,8 +1,8 @@
-#ifndef OWVR_RAW_H
-#define OWVR_RAW_H
+#ifndef OUVR_RAW_H
+#define OUVR_RAW_H
 
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
-struct owvr_network raw_handler;
+struct ouvr_network raw_handler;
 
 #endif

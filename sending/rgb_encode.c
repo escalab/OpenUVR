@@ -5,7 +5,7 @@
 #include "include/libswscale/swscale.h"
 
 #include "rgb_encode.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
 typedef struct rgb_encode_context
 {
@@ -14,7 +14,7 @@ typedef struct rgb_encode_context
 
 static int const srcstride[1] = {-1920 * 3};
 
-static int rgb_initialize(struct owvr_ctx *ctx)
+static int rgb_initialize(struct ouvr_ctx *ctx)
 {
     int ret;
     if (ctx->enc_priv != NULL)
@@ -29,7 +29,7 @@ static int rgb_initialize(struct owvr_ctx *ctx)
 
 #include <time.h>
 
-static int rgb_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int rgb_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     //wait a little longer for receiving side to keep up
     struct timespec wait_time = {.tv_sec = 0, .tv_nsec = 80000000};
@@ -48,13 +48,13 @@ static int rgb_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
 
     return 1;
 }
-static void rgb_deinitialize(struct owvr_ctx *ctx)
+static void rgb_deinitialize(struct ouvr_ctx *ctx)
 {
     void *fdsa = ctx;
     printf("fdsa %p\n", fdsa);
 }
 
-struct owvr_encoder rgb_encode = {
+struct ouvr_encoder rgb_encode = {
     .init = rgb_initialize,
     .process_frame = rgb_process_frame,
     .deinit = rgb_deinitialize,

@@ -12,7 +12,7 @@
 #include <npp.h>
 
 #include "ffmpeg_cuda_encode.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -35,7 +35,7 @@ typedef struct ffmpeg_cuda_encode_context
     CUgraphicsResource resource
 } ffmpeg_cuda_encode_context;
 
-static int ffmpeg_initialize(struct owvr_ctx *ctx)
+static int ffmpeg_initialize(struct ouvr_ctx *ctx)
 {
     int ret;
     if (ctx->enc_priv != NULL)
@@ -145,7 +145,7 @@ static int ffmpeg_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-static int ffmpeg_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     int ret;
     ffmpeg_cuda_encode_context *e = ctx->enc_priv;
@@ -215,7 +215,7 @@ static int ffmpeg_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt)
 
     return 0;
 }
-static void ffmpeg_cuda_copy(struct owvr_ctx *ctx)
+static void ffmpeg_cuda_copy(struct ouvr_ctx *ctx)
 {
     ffmpeg_cuda_encode_context *e = ctx->enc_priv;
     CUcontext oldctx;
@@ -262,7 +262,7 @@ static void ffmpeg_cuda_copy(struct owvr_ctx *ctx)
     err = cuCtxPopCurrent(&oldctx);
 }
 
-static void ffmpeg_deinitialize(struct owvr_ctx *ctx)
+static void ffmpeg_deinitialize(struct ouvr_ctx *ctx)
 {
     ffmpeg_cuda_encode_context *e = ctx->enc_priv;
     CUresult err = cuGraphicsUnregisterResource(e->resource);
@@ -276,7 +276,7 @@ static void ffmpeg_deinitialize(struct owvr_ctx *ctx)
     ctx->enc_priv = NULL;
 }
 
-struct owvr_encoder ffmpeg_cuda_encode = {
+struct ouvr_encoder ffmpeg_cuda_encode = {
     .init = ffmpeg_initialize,
     .process_frame = ffmpeg_process_frame,
     .cuda_copy = ffmpeg_cuda_copy,

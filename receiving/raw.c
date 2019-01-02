@@ -1,5 +1,5 @@
 #include "raw.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,7 +27,7 @@ typedef struct raw_net_context
 
 unsigned char const global_eth_header[14] = {0xb8, 0x27, 0xeb, 0x6c, 0xa7, 0xdd, 0x00, 0x0e, 0x8e, 0x5c, 0x2e, 0x53, 0x88, 0xb5};
 
-static int raw_initialize(struct owvr_ctx *ctx)
+static int raw_initialize(struct ouvr_ctx *ctx)
 {
     if (ctx->net_priv != NULL)
     {
@@ -58,7 +58,7 @@ static int raw_initialize(struct owvr_ctx *ctx)
     static float avg_time = 0;
 #endif
 
-static int raw_receive_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int raw_receive_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
 #ifdef TIME_NETWORK
     struct timeval start_time, end_time;
@@ -125,13 +125,13 @@ static int raw_receive_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
     return 0;
 }
 
-struct owvr_network raw_handler = {
+struct ouvr_network raw_handler = {
     .init = raw_initialize,
     .recv_packet = raw_receive_packet,
 };
 
 #include "openmax_render.h"
-int raw_receive_and_decode(struct owvr_ctx *ctx)
+int raw_receive_and_decode(struct ouvr_ctx *ctx)
 {
     OMX_BUFFERHEADERTYPE *bufs[5];
     omxr_get_available_buffers(bufs, 5);

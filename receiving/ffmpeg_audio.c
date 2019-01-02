@@ -1,4 +1,4 @@
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include "openmax_audio.h"
 #include <stdio.h>
 
@@ -40,7 +40,7 @@ static struct timespec sleep_time = {.tv_sec = 0, .tv_nsec = 100000000};
         OMX_GetState(a, &state);\
         printf("it is in state %d\n", state);\
 }
-static int ffmpeg_audio_init(struct owvr_ctx *ctx){
+static int ffmpeg_audio_init(struct ouvr_ctx *ctx){
     printf("init\n");
 
     // must be called on raspberry pi before making GPU calls
@@ -140,7 +140,7 @@ static int allocate_decoder_input_buffers()
     return 0;
 }
 
-static int ffmpeg_audio_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt){
+static int ffmpeg_audio_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt){
     printf("process\n");
     return 0;
 }
@@ -173,7 +173,7 @@ static void ffmpeg_audio_deinit(){
     printf("deinit\n");
 }
 
-struct owvr_audio ffmpeg_audio = {
+struct ouvr_audio ffmpeg_audio = {
     .init = ffmpeg_audio_init,
     .process_frame = ffmpeg_audio_process_frame,
     .deinit = ffmpeg_audio_deinit,

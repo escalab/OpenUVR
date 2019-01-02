@@ -1,5 +1,5 @@
 #include "udp.h"
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,7 +23,7 @@ typedef struct tcp_net_context
     struct sockaddr_in serv_addr, cli_addr;
 } tcp_net_context;
 
-static int tcp_initialize(struct owvr_ctx *ctx)
+static int tcp_initialize(struct ouvr_ctx *ctx)
 {
     if (ctx->net_priv != NULL)
     {
@@ -62,7 +62,7 @@ static int tcp_initialize(struct owvr_ctx *ctx)
     return 0;
 }
 
-static int tcp_receive_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
+static int tcp_receive_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
 #ifdef TIME_NETWORK
     struct timeval start_time, end_time;
@@ -107,7 +107,7 @@ static int tcp_receive_packet(struct owvr_ctx *ctx, struct owvr_packet *pkt)
     return 0;
 }
 
-struct owvr_network tcp_handler = {
+struct ouvr_network tcp_handler = {
     .init = tcp_initialize,
     .recv_packet = tcp_receive_packet,
 };

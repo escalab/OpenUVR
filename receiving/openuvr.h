@@ -1,28 +1,28 @@
-#ifndef OPENWVR_MAIN_H
-#define OPENWVR_MAIN_H
+#ifndef OPENUVR_MAIN_H
+#define OPENUVR_MAIN_H
 
-enum OPENWVR_NETWORK_TYPE
+enum OPENUVR_NETWORK_TYPE
 {
-    OPENWVR_NETWORK_TCP,
-    OPENWVR_NETWORK_UDP,
-    OPENWVR_NETWORK_RAW,
-    OPENWVR_NETWORK_UDP_COMPAT,
+    OPENUVR_NETWORK_TCP,
+    OPENUVR_NETWORK_UDP,
+    OPENUVR_NETWORK_RAW,
+    OPENUVR_NETWORK_UDP_COMPAT,
 };
 
-enum OPENWVR_DECODER_TYPE
+enum OPENUVR_DECODER_TYPE
 {
-    OPENWVR_DECODER_H264,
-    OPENWVR_DECODER_RGB,
+    OPENUVR_DECODER_H264,
+    OPENUVR_DECODER_RGB,
 };
 
-struct openwvr_context
+struct openuvr_context
 {
     void *priv;
 };
 
-struct openwvr_context *openwvr_alloc_context(enum OPENWVR_DECODER_TYPE dec_type, enum OPENWVR_NETWORK_TYPE net_type);
-int openwvr_receive_frame(struct openwvr_context *context);
-int openwvr_receive_loop(struct openwvr_context *context);
-int openwvr_receive_frame_raw_h264(struct openwvr_context *context);
+struct openuvr_context *openuvr_alloc_context(enum OPENUVR_DECODER_TYPE dec_type, enum OPENUVR_NETWORK_TYPE net_type);
+int openuvr_receive_frame(struct openuvr_context *context);
+int openuvr_receive_loop(struct openuvr_context *context);
+int openuvr_receive_frame_raw_h264(struct openuvr_context *context);
 
 #endif

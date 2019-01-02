@@ -1,8 +1,8 @@
-#ifndef OWVR_UDP_H
-#define OWVR_UDP_H
+#ifndef OUVR_UDP_H
+#define OUVR_UDP_H
 
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 
-struct owvr_network udp_handler;
+struct ouvr_network udp_handler;
 
 #endif

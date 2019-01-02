@@ -10,7 +10,7 @@
         printf("video_decoder is in state %d\n", state);\
 }
 
-struct owvr_decoder openmax_render;
+struct ouvr_decoder openmax_render;
 int omxr_get_available_buffers(OMX_BUFFERHEADERTYPE **pointers, int num);
 int omxr_empty_buffers(OMX_BUFFERHEADERTYPE **pointers, int num);
 

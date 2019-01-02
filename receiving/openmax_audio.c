@@ -1,4 +1,4 @@
-#include "owvr_packet.h"
+#include "ouvr_packet.h"
 #include "openmax_audio.h"
 #include <stdio.h>
 
@@ -38,7 +38,7 @@ static struct timespec sleep_time = {.tv_sec = 0, .tv_nsec = 100000000};
         printf("it is in state %d\n", state);\
 }
 
-static int omxr_audio_init(struct owvr_ctx *ctx){
+static int omxr_audio_init(struct ouvr_ctx *ctx){
     printf("init\n");
 
     // must be called on raspberry pi before making GPU calls
@@ -177,7 +177,7 @@ static int omxr_audio_init(struct owvr_ctx *ctx){
     return 0;
 }
 
-static int omxr_audio_aac_init(struct owvr_ctx *ctx){
+static int omxr_audio_aac_init(struct ouvr_ctx *ctx){
     printf("init\n");
 
     // must be called on raspberry pi before making GPU calls
@@ -346,7 +346,7 @@ static int omxr_audio_aac_init(struct owvr_ctx *ctx){
 
 static int buf_idx = 0;
 
-static int omxr_audio_process_frame(struct owvr_ctx *ctx, struct owvr_packet *pkt){
+static int omxr_audio_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt){
     OMX_ERRORTYPE err;
     unsigned int remaining_bytes = (unsigned int)pkt->size;
     unsigned char *pos = pkt->data;
@@ -401,7 +401,7 @@ static OMX_ERRORTYPE fill_buffer_done_callback(OMX_HANDLETYPE hComponent, OMX_PT
     return OMX_ErrorNone;
 }
 
-static void omxr_audio_deinit(struct owvr_ctx *ctx){
+static void omxr_audio_deinit(struct ouvr_ctx *ctx){
     OMX_ERRORTYPE err;
     printf("deinit\n");
     nanosleep(&sleep_time, NULL);
@@ -418,7 +418,7 @@ static void omxr_audio_deinit(struct owvr_ctx *ctx){
     printf("deinited\n");
 }
 
-struct owvr_audio openmax_audio = {
+struct ouvr_audio openmax_audio = {
     .init = omxr_audio_init,
     .process_frame = omxr_audio_process_frame,
     .deinit = omxr_audio_deinit,

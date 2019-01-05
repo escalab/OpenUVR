@@ -20,19 +20,44 @@ From the `OpenUVR/sending/` directory, run `make` to compile the OpenUVR shared 
 IOQuake3 is the game we're using to to run OpenUVR. It is open source and runs on Linux, so we need to download the source code, modify it to use OpenUVR, then compile and run it.
 
 1. Clone the IOQuake3 repository somewhere into your home directory: `https://github.com/ioquake/ioq3.git`.
-2. Edit `ioq3/Makefile`. Under the `SETUP AND BUILD -- LINUX` section, replace the `LIBS=...` line (should be around line 392) with the following 3 lines:
+2. Edit `ioq3/Makefile`. Under the `SETUP AND BUILD -- LINUX` section, replace the `RENDERER_LIBS=...` line (should be around line 396) with `RENDERER_LIBS = $(SDL_LIBS) -lGL`. Also replace the `LIBS=...` line just above that with the following 3 lines:
 ```
-OPENUVR_FFMPEG_LIB_DIR=<replace this with the absolute path to your ffmpeg_build/lib directory>
+OPENUVR_FFMPEG_LIB_DIR=/your/path/to/OpenUVR/sending/ffmpeg_build/lib
 LIBS=-L/usr/local/cuda/lib64 -lopenuvr -lcuda -lglut $(OPENUVR_FFMPEG_LIB_DIR)/libavdevice.so $(OPENUVR_FFMPEG_LIB_DIR)/libavfilter.so $(OPENUVR_FFMPEG_LIB_DIR)/libavformat.so $(OPENUVR_FFMPEG_LIB_DIR)/libavcodec.so $(OPENUVR_FFMPEG_LIB_DIR)/libavutil.so $(OPENUVR_FFMPEG_LIB_DIR)/libswscale.so $(OPENUVR_FFMPEG_LIB_DIR)/libswresample.so -lnppicc -lnppig -lnppc -lass -lSDL2-2.0 -lsndio -lasound -lvdpau -ldl -lva -lva-drm -lXext -lxcb-shm -lxcb-xfixes -lxcb-shape -lxcb -lXv -lfreetype -lpostproc -lva-x11 -lX11 -lpthread -lm -lz
 CLIENT_CFLAGS+=-I/usr/local/cuda/include
 ```
 3. The `ioq3/code/sdl/sdl_glimp.c` file is the entry point that we will use to call into our OpenUVR library.
-   1. First, include our header by inserting `#include <openuvr/openuvr.h>` near the top. Below that, declare the global struct which will hold the OpenUVR context with `struct openuvr_context *ouvr_ctx;`
-   2. Declare four functions that take no parameters and return void, which we'll call `setup_openuvr_nocuda()`, `setup_openuvr_cuda()`, `send_openuvr_nocuda()`, and `send_openuvr_cuda()`. `setup_openuvr_nocuda()` will set up the `ouvr_ctx` in a mode which does not use CUDA, meaning that it is passed the pointer to a region in memory containing the RGB values of each frame, and `send_openuvr_nocuda()` will send that region. `setup_openuvr_cuda()` will set up the `ouvr_ctx` in a mode using CUDA, which means that it is passed a pointer to a `PixelBufferObject`, which allows it to take the RGB values directly from GPU memory.
-      - `setup_openuvr_nocuda` should contain code such as:
+   1. First, include our header by inserting `#include <openuvr/openuvr.h>` near the top. Below that, declare the global struct which will hold the OpenUVR context with `struct openuvr_context *ouvr_ctx;`. Also include the OpenGL header that enables cuda functionality with `#include <GLES3/gl3.h>`.
+   2. Declare four functions that take no parameters and return void, which we'll call `setup_openuvr_nocuda()`, `send_openuvr_nocuda()`, `setup_openuvr_cuda()`, and `send_openuvr_cuda()`. `setup_openuvr_nocuda()` will set up the `ouvr_ctx` in a mode which does not use CUDA, meaning that it is passed the pointer to a region in memory containing the RGB values of each frame, and `send_openuvr_nocuda()` will send that region. `setup_openuvr_cuda()` will set up the `ouvr_ctx` in a mode using CUDA, which means that it is passed a pointer to a `PixelBufferObject`, which allows it to take the RGB values directly from GPU memory.
+      - `setup_openuvr_nocuda()` should contain code such as the following, after declaring `buf` as a global `unsigned char *`:
       ```
-      unsigned char *buf = malloc(4 * glConfig.vidWidth * glConfig.vidHeight);
-      ouvr_ctx = openuvr_alloc_context(<encoder_type>, <network_type>, buf);
+      buf = malloc(4 * glConfig.vidWidth * glConfig.vidHeight);
+      ouvr_ctx = openuvr_alloc_context(OPENUVR_ENCODER_H264, OPENUVR_NETWORK_RAW, buf);
+      openuvr_init_thread_continuous(ouvr_ctx);
       ```
-   2. Towards the end of the `GLimp_SetMode()` function, insert the code to setup the OpenUVR context:
+      - `send_openuvr_nocuda()` should contain code such as:
+      ```
+      glReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+      ```
+      - `setup_openuvr_cuda()` should contain code such as:
+      ```
+      GLuint pbo;
+      glGenBuffers(1, &pbo);
+      glBindBuffer(GL_PIXEL_PACK_BUFFER, pbo);
+      glBufferData(GL_PIXEL_PACK_BUFFER, glConfig.vidWidth*glConfig.vidHeight*4, 0, GL_DYNAMIC_COPY);
+      glReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+      ouvr_ctx = openuvr_alloc_context(OPENUVR_ENCODER_H264_CUDA, OPENUVR_NETWORK_RAW, &pbo);
+      openuvr_cuda_copy(ouvr_ctx, NULL);
+      openuvr_init_thread_continuous(ouvr_ctx);
+      ```
+      - `send_openuvr_cuda()` should contain code such as:
+      ```
+      glReadPixels(0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+      // technically should be called, but seems to be optional, and should be investigated:
+      openuvr_cuda_copy(ouvr_ctx, NULL);
+      ```
+   3. At the end of the `GLimp_SetMode()` function, insert the call to either `setup_openuvr_nocuda()` or `setup_openuvr_cuda()`.
+   4. At the beginning of the `GLimp_EndFrame()` function, insert the call to either `send_openuvr_nocuda()` or `send_openuvr_cuda()` immediately before the call to `SDL_GL_SwapWindow()`. It should go before the call to `SDL_GL_SwapWindow()` since `qglReadPixels()` reads from the back buffer, so this way it will start processing frames before they are displayed to the player on the host machine.
 4. TODO run the make script. This will compile ioq3 and install it to your home directory in the `~/bin/ioquake3` directory.
+
+Now that Quake 3 is installed, you can run it using `sudo LD_LIBRARY_PATH=/your/path/to/OpenUVR/sending/ffmpeg_build/lib ~/bin/ioquake3/ioquake3.x86_64`.

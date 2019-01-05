@@ -61,3 +61,17 @@ CLIENT_CFLAGS+=-I/usr/local/cuda/include
 4. TODO run the make script. This will compile ioq3 and install it to your home directory in the `~/bin/ioquake3` directory.
 
 Now that Quake 3 is installed, you can run it using `sudo LD_LIBRARY_PATH=/your/path/to/OpenUVR/sending/ffmpeg_build/lib ~/bin/ioquake3/ioquake3.x86_64`.
+
+## Compiling on the Raspberry Pi (receiving side)
+1. Clone the `OpenUVR` repository anywhere in your home directory on the Raspberry Pi.
+2. Enter the `OpenUVR/receiving` directory.
+3. Compile the standalone `openuvr` program with `make`.
+
+## Running on the Raspberry Pi (receiving side)
+Run the program with `sudo ./openuvr <encoding_type> <network_type>`.\
+`<encoding type>` can be one of `h264` or `rgb`, but it will likely always be `h264` for your purposes.
+`<network_type>` can be one of `raw`, `udp`, `udp_compat`, or `tcp`. Whatever is chosen, it must match the protocol used on the sending side. `tcp` should not be used except for testing purposes. `udp_compat` is used when the sending side is some program other than OpenUVR which sends frames using UDP (for example the ffmpeg executable). `raw` is the optimal choice (measured around 1% faster than UDP, but further optimizations can possibly improve this).
+
+The program must be run with `sudo` only if the `raw` protocol is used. Otherwise, it can be run with or without `sudo`.
+
+When running `openuvr`, you should be able to notice that every so often it gets laggy and drops frames. This is because the display manager on the raspberry pi performs periodic tasks which disrupt `openuvr`. To run it without these interruptions, go into TTY1 using `ctrl+alt+F1`. Log in (probably using the default username `pi` and password `raspberry`), then kill the display manager with `sudo systemctl stop lightdm`. This will kill any windows you had open. To return to desktop mode, use `sudo systemctl start lightdm`.

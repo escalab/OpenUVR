@@ -2,3 +2,6 @@
 	path = sending/FFmpeg
 	url = https://github.com/FFmpeg/FFmpeg.git
 	branch = release/4.0
+[submodule "quake/ioq3"]
+	path = quake/ioq3
+	url = https://github.com/ioquake/ioq3.git

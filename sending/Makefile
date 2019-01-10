@@ -13,4 +13,4 @@ ffmpeg:
 
 .PHONY: clean
 clean:
-	@$(MAKE) -C src/ all
+	@$(MAKE) -C src/ clean

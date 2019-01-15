@@ -56,7 +56,7 @@ int get_axes(uint8_t bytes[], int r1, int r2)
     return a;
 }
 
-void get_coord(int file, coord* c)
+void get_coord(int file, struct coord* c)
 {
     uint8_t bytes[6];
     if (i2c_smbus_read_i2c_block_data(file, AXES_DATA, 6, bytes) < 0)
@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     set_range(i2c_fileno, RANGE_2G);
     enable_measurement(i2c_fileno);
 
-    coord c;
+    struct coord c;
     while(1) 
     {
         get_coord(i2c_fileno, &c);

@@ -1,16 +1,26 @@
-CFLAGS=-std=c11 -fPIC -Wall -Wextra -D_GNU_SOURCE=1 -O3 -I$(shell pwd)/../ffmpeg_build -I$(shell pwd)/../ffmpeg_build/include -I/usr/local/cuda/include $(TIME_FLAGS)
+CFLAGS=-std=c11 -fPIC -Wall -Wextra -D_GNU_SOURCE=1 -O3 -I$(shell pwd)/../ffmpeg_build -I$(shell pwd)/../ffmpeg_build/include -I/usr/local/cuda/include -I/usr/include/python3.5m $(TIME_FLAGS)
 
-OBJS=ouvr_packet.o tcp.o udp.o udp_compat.o raw.o ffmpeg_encode.o ffmpeg_cuda_encode.o rgb_encode.o ffmpeg_audio.o asoundlib_audio.o openuvr.o feedback_net.o input_recv.o
+OBJS=ouvr_packet.o tcp.o udp.o udp_compat.o raw.o ffmpeg_encode.o ffmpeg_cuda_encode.o rgb_encode.o ffmpeg_audio.o asoundlib_audio.o openuvr.o openuvr_managed.o feedback_net.o input_recv.o ssim_dummy_net.o ssim_plugin.o
 
 .PHONY: all
-all: libopenuvr.so
+all: libopenuvr.so libopenuvr.a ssim_plugin.c
 
 libopenuvr.so: $(OBJS)
 	gcc -shared -o libopenuvr.so $(OBJS)
 	chmod -x libopenuvr.so
 
+FFMPEG_LIB_DIR=/home/arrohlof/transition/OpenUVR/sending/ffmpeg_build/lib
+
+libopenuvr.a: $(OBJS)
+	ar rcs libopenuvr.a $(OBJS) $(FFMPEG_LIB_DIR)/libavdevice.a $(FFMPEG_LIB_DIR)/libavfilter.a $(FFMPEG_LIB_DIR)/libavformat.a $(FFMPEG_LIB_DIR)/libavcodec.a $(FFMPEG_LIB_DIR)/libavutil.a $(FFMPEG_LIB_DIR)/libswscale.a $(FFMPEG_LIB_DIR)/libswresample.a
+
 %.o: %.c
 	gcc $(CFLAGS) -c $< -o $@
+
+
+
+ssim_plugin.c: ssim_plugin_builder.py ssim_plugin_src.py ssim_plugin.h
+	python3 ssim_plugin_builder.py
 
 # Optional program to send content from shared memory buffer:
 # openuvr: main.o libopenuvr.so
@@ -20,6 +30,7 @@ libopenuvr.so: $(OBJS)
 install: libopenuvr.so
 	rsync openuvr.h /usr/local/include/openuvr/
 	rsync libopenuvr.so /usr/local/lib/
+	rsync libopenuvr.a /usr/local/lib/
 
 .PHONY: clean
 clean:

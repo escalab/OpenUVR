@@ -26,11 +26,10 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     }
     ffmpeg_audio_context *a = calloc(1, sizeof(ffmpeg_audio_context));
     ctx->aud_priv = a;
-    avcodec_register_all();
     AVCodec *enc = avcodec_find_encoder(AV_CODEC_ID_AAC);
     if (enc == NULL)
     {
-        printf("couldn't find encoder\n");
+        PRINT_ERR("couldn't find encoder\n");
         return -1;
     }
     a->enc_ctx = avcodec_alloc_context3(enc);
@@ -43,7 +42,7 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     ret = avcodec_open2(a->enc_ctx, enc, NULL);
     if (ret < 0)
     {
-        printf("avcodec_open2 failed\n");
+        PRINT_ERR("avcodec_open2 failed\n");
         return -1;
     }
 
@@ -60,21 +59,21 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     ret = avformat_open_input(&a->alsa_fmt_ctx, "loopout", a->alsa_fmt_ctx->iformat, NULL);
     if (ret < 0)
     {
-        printf("avformat_open_input failed\n");
+        PRINT_ERR("avformat_open_input failed\n");
         return -1;
     }
 
     ret = avformat_find_stream_info(a->alsa_fmt_ctx, NULL);
     if (ret < 0)
     {
-        printf("avformat_find_stream_info failed\n");
+        PRINT_ERR("avformat_find_stream_info failed\n");
         return -1;
     }
 
     // int stream_idx = av_find_best_stream(a->alsa_fmt_ctx, AVMEDIA_TYPE_AUDIO, -1, -1, NULL, 0);
     // if (stream_idx < 0)
     // {
-    //     printf("av_find_best_stream failed\n");
+    //     PRINT_ERR("av_find_best_stream failed\n");
     //     return -1;
     // }
 
@@ -82,7 +81,7 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     // AVCodec *alsa_dec = avcodec_find_decoder( a->alsa_fmt_ctx->streams[ 0 ]->codecpar->codec_id );
     // if (alsa_dec == NULL)
     // {
-    //     printf("avcodec_find_decoder failed\n");
+    //     PRINT_ERR("avcodec_find_decoder failed\n");
     //     return -1;
     // }
 
@@ -115,7 +114,7 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     }
     else if (ret != -11)
     {
-        printf("avcodec_receive_packet error: %d\n", ret);
+        PRINT_ERR("avcodec_receive_packet error: %d\n", ret);
         return -1;
     }
 
@@ -132,7 +131,7 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
         ret = av_read_frame(a->alsa_fmt_ctx, &alsa_pkts[i]);
         if (ret < 0)
         {
-            printf("av_read_frame failed\n");
+            PRINT_ERR("av_read_frame failed\n");
             return -1;
         }
     }
@@ -153,12 +152,12 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     }
 
     a->frame->nb_samples = 256;
-    ret = avcodec_fill_audio_frame(a->frame, 2, a->enc_ctx->sample_fmt, flt_buf, 2048, 32);
+    ret = avcodec_fill_audio_frame(a->frame, 2, a->enc_ctx->sample_fmt, (const uint8_t *)flt_buf, 2048, 32);
 
     ret = avcodec_send_frame(a->enc_ctx, a->frame);
     if (ret != 0 && ret != -11)
     {
-        printf("avcodec_send_frame() failed: %d\n", ret);
+        PRINT_ERR("avcodec_send_frame() failed: %d\n", ret);
         return -1;
     }
 
@@ -167,7 +166,7 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 static void ffmpeg_deinitialize(struct ouvr_ctx *ctx)
 {
     void *fdsa = ctx;
-    printf("fdsa %p\n", fdsa);
+    printf("ffmpeg_deinitialize was called but is unimplemented %p\n", fdsa);
 }
 
 struct ouvr_audio ffmpeg_audio = {

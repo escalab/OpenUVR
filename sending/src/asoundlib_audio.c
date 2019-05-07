@@ -25,49 +25,49 @@ static int asoundlib_initialize(struct ouvr_ctx *ctx)
     ret = snd_pcm_open(&a->alsa_ctx, "loopout", SND_PCM_STREAM_CAPTURE, 0);
     if (ret < 0)
     {
-        printf("snd_pcm_open() failed\n");
+        PRINT_ERR("snd_pcm_open() failed\n");
         return -1;
     }
 
     ret = snd_pcm_hw_params_malloc(&hw_params);
     if (ret < 0)
     {
-        printf("snd_pcm_hw_params_malloc() failed\n");
+        PRINT_ERR("snd_pcm_hw_params_malloc() failed\n");
         return -1;
     }
 
     ret = snd_pcm_hw_params_any(a->alsa_ctx, hw_params);
     if (ret < 0)
     {
-        printf("snd_pcm_hw_params_any() failed\n");
+        PRINT_ERR("snd_pcm_hw_params_any() failed\n");
         return -1;
     }
 
     ret = snd_pcm_hw_params_set_access(a->alsa_ctx, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED);
     if (ret < 0)
     {
-        printf("snd_pcm_hw_params_set_access() failed\n");
+        PRINT_ERR("snd_pcm_hw_params_set_access() failed\n");
         return -1;
     }
 
     ret = snd_pcm_hw_params_set_format(a->alsa_ctx, hw_params, SND_PCM_FORMAT_S16_LE);
     if (ret < 0)
     {
-        printf("snd_pcm_hw_params_set_format() failed\n");
+        PRINT_ERR("snd_pcm_hw_params_set_format() failed\n");
         return -1;
     }
 
     ret = snd_pcm_hw_params_set_rate_near(a->alsa_ctx, hw_params, &rate, 0);
     if (ret < 0)
     {
-        printf("snd_pcm_hw_params_set_rate_near() failed\n");
+        PRINT_ERR("snd_pcm_hw_params_set_rate_near() failed\n");
         return -1;
     }
 
     ret = snd_pcm_hw_params_set_channels(a->alsa_ctx, hw_params, 2);
     if (ret < 0)
     {
-        printf("snd_pcm_hw_params_set_channels() failed\n");
+        PRINT_ERR("snd_pcm_hw_params_set_channels() failed\n");
         return -1;
     }
 
@@ -75,7 +75,7 @@ static int asoundlib_initialize(struct ouvr_ctx *ctx)
     ret = snd_pcm_hw_params(a->alsa_ctx, hw_params);
     if (ret < 0)
     {
-        printf("snd_pcm_hw_params() failed\n");
+        PRINT_ERR("snd_pcm_hw_params() failed\n");
         return -1;
     }
 
@@ -84,7 +84,7 @@ static int asoundlib_initialize(struct ouvr_ctx *ctx)
     ret = snd_pcm_prepare(a->alsa_ctx);
     if (ret < 0)
     {
-        printf("snd_pcm_prepare() failed\n");
+        PRINT_ERR("snd_pcm_prepare() failed\n");
         return -1;
     }
 

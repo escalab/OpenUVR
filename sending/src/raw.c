@@ -43,7 +43,7 @@ static int raw_initialize(struct ouvr_ctx *ctx)
     c->fd = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_802_EX1));
     if (c->fd < 0)
     {
-        printf("Couldn't create socket\n");
+        PRINT_ERR("Couldn't create socket\n");
         return -1;
     }
 
@@ -88,7 +88,7 @@ static int raw_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
         r = sendmsg(c->fd, &c->msg, 0);
         if (r < -1)
         {
-            printf("Error on sendmsg: %ld\n", r);
+            PRINT_ERR("sendmsg returned %ld\n", r);
             return -1;
         }
         else if (r > 0)
@@ -103,7 +103,7 @@ static int raw_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     return 0;
 }
 
-static int raw_deinitialize(struct ouvr_ctx *ctx)
+static void raw_deinitialize(struct ouvr_ctx *ctx)
 {
     raw_net_context *c = ctx->net_priv;
     close(c->fd);

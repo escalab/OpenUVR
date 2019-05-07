@@ -8,7 +8,6 @@
 #include "include/libavutil/hwcontext.h"
 #include "include/libavutil/hwcontext_cuda.h"
 #include <cuda.h>
-#include <GLES3/gl3.h>
 #include <npp.h>
 
 #include "ffmpeg_cuda_encode.h"
@@ -32,7 +31,7 @@ typedef struct ffmpeg_cuda_encode_context
     int idx;
     CUcontext *cuda_ctx;
     CUDA_MEMCPY2D memCpyStruct;
-    CUgraphicsResource resource
+    CUgraphicsResource resource;
 } ffmpeg_cuda_encode_context;
 
 static int ffmpeg_initialize(struct ouvr_ctx *ctx)
@@ -40,16 +39,15 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     int ret;
     if (ctx->enc_priv != NULL)
     {
-        printf("cannot initialize ffmpeg CUDA because encoder is already initialized\n");
+        PRINT_ERR("Cannot initialize ffmpeg CUDA because encoder is already initialized\n");
         return -1;
     }
     ffmpeg_cuda_encode_context *e = calloc(1, sizeof(ffmpeg_cuda_encode_context));
     ctx->enc_priv = e;
-    avcodec_register_all();
     AVCodec *enc = avcodec_find_encoder_by_name("h264_nvenc");
     if (enc == NULL)
     {
-        printf("couldn't find encoder\n");
+        PRINT_ERR("Couldn't find encoder\n");
         return -1;
     }
     e->enc_ctx = avcodec_alloc_context3(enc);
@@ -80,7 +78,7 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     ret = av_hwdevice_ctx_create(&e->enc_ctx->hw_device_ctx, AV_HWDEVICE_TYPE_CUDA, "Quadro P4000", NULL, 0);
     if (ret != 0)
     {
-        printf("hwdevice_ctx_create failed %d\n", ret);
+        PRINT_ERR("hwdevice_ctx_create failed %d\n", ret);
         return -1;
     }
     AVHWDeviceContext *thing1 = (AVHWDeviceContext *)(e->enc_ctx->hw_device_ctx->data);
@@ -98,17 +96,17 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     ret = av_hwframe_ctx_init(e->enc_ctx->hw_frames_ctx);
     if (ret < 0)
     {
-        printf("av_hwframe_ctx_init failed\n");
+        PRINT_ERR("av_hwframe_ctx_init failed\n");
         return -1;
     }
 
     CUcontext oldctx;
     CUresult err = cuCtxPopCurrent(&oldctx);
     err = cuCtxPushCurrent(*(e->cuda_ctx));
-    err = cuGraphicsGLRegisterBuffer(&e->resource, *(int *)(ctx->pix_buf), CU_GRAPHICS_REGISTER_FLAGS_READ_ONLY);
+    err = cuGraphicsGLRegisterBuffer(&e->resource, ctx->pbo_handle, CU_GRAPHICS_REGISTER_FLAGS_READ_ONLY);
     if (err != 0)
     {
-        printf("error in registering GL buffer: %d\n", err);
+        PRINT_ERR("error in registering GL buffer: %d\n", err);
         exit(1);
     }
 
@@ -120,7 +118,7 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     ret = avcodec_open2(e->enc_ctx, enc, NULL);
     if (ret < 0)
     {
-        printf("avcodec_open2 failed\n");
+        PRINT_ERR("avcodec_open2 failed\n");
         return -1;
     }
 
@@ -128,12 +126,11 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     e->frame->format = e->enc_ctx->pix_fmt;
     e->frame->width = e->enc_ctx->width;
     e->frame->height = e->enc_ctx->height;
-    e->frame->format = AV_PIX_FMT_CUDA;
 
-    printf("before: %p\n", e->frame->data[0]);
+    // printf("before: %p\n", e->frame->data[0]);
     av_hwframe_get_buffer(e->enc_ctx->hw_frames_ctx, e->frame, 0);
-    printf("after: %p\n", e->frame->data[0]);
-    printf("linesize: %d\n", e->frame->linesize[0]);
+    // printf("after: %p\n", e->frame->data[0]);
+    // printf("linesize: %d\n", e->frame->linesize[0]);
 
     e->memCpyStruct.srcXInBytes = 0;
     e->memCpyStruct.srcY = 0;
@@ -168,7 +165,7 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     }
     else if (ret != -11)
     {
-        printf("avcodec_receive_packet error: %d\n", ret);
+        PRINT_ERR("avcodec_receive_packet error: %d\n", ret);
         return -1;
     }
 
@@ -184,12 +181,18 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     nppiRGBToYUV420_8u_C3P3R(e->memCpyStruct.srcDevice, WIDTH * 3, e->frame->data, e->frame->linesize, fdsa);
 #else
     err = cuMemcpy2D(&e->memCpyStruct);
+    if (err != 0)
+    {
+        PRINT_ERR("cuMemcpy2D err=%d\n", err);
+        exit(1);
+    }
 #endif
+
 
     // err = cuMemcpy((CUdeviceptr)e->frame->data[0],srcDevicePtr, WIDTH*HEIGHT*4);
     //printf("memcpy: %d %d\n", err, e->frame->linesize[0]);
 
-    err = cuCtxPopCurrent(&oldctx);
+    cuCtxPopCurrent(&oldctx);
 
     frame->pts = e->idx++;
     if (ctx->flag_send_iframe > 0)
@@ -209,7 +212,7 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     ret = avcodec_send_frame(e->enc_ctx, frame);
     if (ret != 0 && ret != -11)
     {
-        printf("avcodec_send_frame() failed: %d\n", ret);
+        PRINT_ERR("avcodec_send_frame() failed: %d\n", ret);
         return -1;
     }
 
@@ -219,7 +222,6 @@ static void ffmpeg_cuda_copy(struct ouvr_ctx *ctx)
 {
     ffmpeg_cuda_encode_context *e = ctx->enc_priv;
     CUcontext oldctx;
-    CUarray srcArray;
     CUdeviceptr srcDevPtr;
     CUresult err = cuCtxPopCurrent(&oldctx);
     err = cuCtxPushCurrent(*(e->cuda_ctx));
@@ -228,28 +230,29 @@ static void ffmpeg_cuda_copy(struct ouvr_ctx *ctx)
     err = cuGraphicsResourceSetMapFlags(resource, CU_GRAPHICS_MAP_RESOURCE_FLAGS_READ_ONLY);
     if (err != 0)
     {
-        printf("setMapFlags err=%d\n", err);
+        PRINT_ERR("setMapFlags err=%d\n", err);
         exit(1);
     }
 
     err = cuGraphicsMapResources(1, &resource, 0);
     if (err != 0)
     {
-        printf("mapResources err=%d\n", err);
+        PRINT_ERR("mapResources err=%d\n", err);
         exit(1);
     }
 
-    err = cuGraphicsResourceGetMappedPointer(&srcDevPtr, WIDTH * HEIGHT * 4, resource);
+    size_t _ = 0;
+    err = cuGraphicsResourceGetMappedPointer(&srcDevPtr, &_, resource);
     if (err != 0)
     {
-        printf("getMappedArray err=%d\n", err);
+        PRINT_ERR("getMappedArray err=%d\n", err);
         exit(1);
     }
 
     err = cuGraphicsUnmapResources(1, &resource, 0);
     if (err != 0)
     {
-        printf("unmapResources err=%d\n", err);
+        PRINT_ERR("unmapResources err=%d\n", err);
         exit(1);
     }
 
@@ -268,7 +271,7 @@ static void ffmpeg_deinitialize(struct ouvr_ctx *ctx)
     CUresult err = cuGraphicsUnregisterResource(e->resource);
     if (err != 0)
     {
-        printf("ffmpeg_deinitialize failed at cuGraphicsUnregisterResource, err=%d\n", err);
+        PRINT_ERR("ffmpeg_deinitialize failed at cuGraphicsUnregisterResource, err=%d\n", err);
         exit(1);
     }
     avcodec_free_context(&e->enc_ctx);

@@ -36,7 +36,7 @@ static int tcp_initialize(struct ouvr_ctx *ctx)
     c->fd = socket(AF_INET, SOCK_STREAM, 0);
     if (c->fd < 0)
     {
-        printf("Couldn't create socket\n");
+        PRINT_ERR("Couldn't create socket\n");
         return -1;
     }
 
@@ -48,7 +48,7 @@ static int tcp_initialize(struct ouvr_ctx *ctx)
 
     if (bind(c->fd, (struct sockaddr *)&c->serv_addr, sizeof(c->serv_addr)) < 0)
     {
-        printf("Couldn't bind\n");
+        PRINT_ERR("Couldn't bind\n");
         return -1;
     }
 
@@ -74,7 +74,7 @@ static int tcp_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     r = write(c->send_fd, &nleft, sizeof(nleft));
     if (r != sizeof(nleft))
     {
-        printf("Error on writing num left: returned %d\n", r);
+        PRINT_ERR("Error on writing num left: returned %d\n", r);
         close(c->send_fd);
         c->send_fd = -1;
         return 0;
@@ -86,7 +86,7 @@ static int tcp_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
         r = write(c->send_fd, pos, nleft);
         if (r < 0)
         {
-            printf("Error on write: returned %d\n", r);
+            PRINT_ERR("Error on write: returned %d\n", r);
             close(c->send_fd);
             c->send_fd = -1;
             return 0;

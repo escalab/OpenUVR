@@ -27,16 +27,15 @@ typedef struct feedback_net_context
     struct iovec iov[3];
 } feedback_net_context;
 
-static feedback_net_context fb_net;
-
 int feedback_initialize(struct ouvr_ctx *ctx)
 {
-    feedback_net_context *c = &fb_net;
+    feedback_net_context *c = malloc(sizeof(feedback_net_context));
+    ctx->fbn_priv = c;
 
     c->fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (c->fd < 0)
     {
-        printf("Couldn't create socket\n");
+        PRINT_ERR("Couldn't create socket\n");
         return -1;
     }
 
@@ -50,12 +49,12 @@ int feedback_initialize(struct ouvr_ctx *ctx)
 
     if (bind(c->fd, (struct sockaddr *)&c->serv_addr, sizeof(c->serv_addr)) < 0)
     {
-        printf("Couldn't bind feedback\n");
+        PRINT_ERR("Couldn't bind feedback\n");
         return -1;
     }
     if (connect(c->fd, (struct sockaddr *)&c->cli_addr, sizeof(c->cli_addr)) < 0)
     {
-        printf("Couldn't connect feedback\n");
+        PRINT_ERR("Couldn't connect feedback\n");
         return -1;
     }
     int flags = fcntl(c->fd, F_GETFL, 0);
@@ -68,7 +67,7 @@ int feedback_initialize(struct ouvr_ctx *ctx)
 
 int feedback_receive(struct ouvr_ctx *ctx)
 {
-    feedback_net_context *c = &fb_net;
+    feedback_net_context *c = ctx->fbn_priv;
     register ssize_t r;
     int to_recv = 0;
     c->iov[0].iov_len = sizeof(to_recv);
@@ -77,7 +76,7 @@ int feedback_receive(struct ouvr_ctx *ctx)
     r = recvmsg(c->fd, &c->msg, 0);
     if (r < -1)
     {
-        printf("Error on sendmsg: %ld\n", r);
+        PRINT_ERR("sendmsg returned %ld\n", r);
         return -1;
     }
     else if (r >= 0 && ctx->flag_send_iframe == 0)

@@ -12,6 +12,9 @@ struct ouvr_ctx;
 #define SERVER_IP "192.168.1.2"
 #define CLIENT_IP "192.168.1.3"
 
+#include <stdio.h>
+#define PRINT_ERR(format, ...) fprintf(stderr, "\33[31;4mOpenUVR Error:%s:%d:\033[24m " format "\033[0m", __FILE__, __LINE__, ##__VA_ARGS__)
+
 struct ouvr_packet
 {
     unsigned char *data;
@@ -49,11 +52,17 @@ struct ouvr_ctx
     void *net_priv;
     struct ouvr_encoder *enc;
     void *enc_priv;
+    //pointer to private data used by feedback_net
+    void *fbn_priv;
     unsigned char *pix_buf;
+    unsigned int pbo_handle;
     struct ouvr_audio *aud;
     void *aud_priv;
     struct ouvr_packet *packet;
     int flag_send_iframe;
+
+    //contains variables for use in the main loops found in openuvr.c
+    void *main_priv;
 };
 
 #endif

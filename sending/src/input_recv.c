@@ -39,13 +39,13 @@ static void setup_mouse_file_descriptors()
     mouse_fd = open("/dev/input/event16", O_WRONLY);
     if (mouse_fd < 0)
     {
-        printf("Couldn't open event3\n");
+        PRINT_ERR("Couldn't open event3\n");
     }
 
     keyboard_fd = open("/dev/input/event5", O_WRONLY);
     if (keyboard_fd < 0)
     {
-        printf("Couldn't open event4\n");
+        PRINT_ERR("Couldn't open event4\n");
     }
 
     mouse_recv_fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -74,14 +74,13 @@ static void setup_mouse_file_descriptors()
 
 static void *receive_input_loop(void *arg)
 {
-            // printf('asdf\n');
+    arg = (void *)arg;
     setup_mouse_file_descriptors();
     struct input_event event_temp[32];
     do
     {
         if (poll(&mouse_poll, 1, 1000) == 1)
         {
-            // printf('fdsa\n');
             recvmsg(mouse_recv_fd, &mouse_msg, 0);
             for (int i = 0; i < event[15].code; i++)
             {
@@ -91,7 +90,10 @@ static void *receive_input_loop(void *arg)
                 event_temp[i].type = event[i].type;
                 event_temp[i].value = event[i].value;
             }
-            write(mouse_fd, event_temp, event[15].code * sizeof(struct input_event));
+            if (write(mouse_fd, event_temp, event[15].code * sizeof(struct input_event)) < 0)
+            {
+                PRINT_ERR("Write failed\n");
+            }
             for (int i = 16; i < 16 + event[31].code; i++)
             {
                 event_temp[i].code = event[i].code;
@@ -100,7 +102,10 @@ static void *receive_input_loop(void *arg)
                 event_temp[i].type = event[i].type;
                 event_temp[i].value = event[i].value;
             }
-            write(keyboard_fd, event_temp + 16, event[31].code * sizeof(struct input_event));
+            if (write(keyboard_fd, event_temp + 16, event[31].code * sizeof(struct input_event)) < 0)
+            {
+                PRINT_ERR("Write failed\n");
+            }
         }
     } while (1);
     return 0;

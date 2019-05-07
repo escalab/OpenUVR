@@ -16,7 +16,6 @@ static int const srcstride[1] = {-1920 * 3};
 
 static int rgb_initialize(struct ouvr_ctx *ctx)
 {
-    int ret;
     if (ctx->enc_priv != NULL)
     {
         free(ctx->enc_priv);
@@ -51,7 +50,7 @@ static int rgb_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 static void rgb_deinitialize(struct ouvr_ctx *ctx)
 {
     void *fdsa = ctx;
-    printf("fdsa %p\n", fdsa);
+    printf("rgb_deinitialize was called but is unimplemented %p\n", fdsa);
 }
 
 struct ouvr_encoder rgb_encode = {

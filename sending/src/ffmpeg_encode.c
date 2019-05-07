@@ -6,11 +6,16 @@
 
 #include "ffmpeg_encode.h"
 #include "ouvr_packet.h"
+#include "ssim_plugin.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
 
-// #define USE_YUV
+/* output defaults to ABGR, but uncomment following line to output as YUV420p */
+// #define OUTPUT_YUV
+/* input defaults to RGBA, but uncomment following line to handle RGB input */
+// #define INPUT_RGB
+// #define MEASURE_SSIM
 
 typedef struct ffmpeg_encode_context
 {
@@ -20,9 +25,17 @@ typedef struct ffmpeg_encode_context
     struct SwsContext *rgb_to_yuv_ctx;
 } ffmpeg_encode_context;
 
-#ifdef USE_YUV
+#ifdef OUTPUT_YUV
+#define OUTPUT_PIX_FMT AV_PIX_FMT_YUV420P
+#else
+#define OUTPUT_PIX_FMT AV_PIX_FMT_0BGR32
+#endif
+
+#ifdef INPUT_RGB
+#define INPUT_PIX_FMT AV_PIX_FMT_RGB24
 static int const srcstride[1] = {WIDTH * 3};
 #else
+#define INPUT_PIX_FMT AV_PIX_FMT_RGB0
 static int const srcstride[1] = {WIDTH * 4};
 #endif
 
@@ -35,11 +48,10 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     }
     ffmpeg_encode_context *e = calloc(1, sizeof(ffmpeg_encode_context));
     ctx->enc_priv = e;
-    avcodec_register_all();
     AVCodec *enc = avcodec_find_encoder_by_name("h264_nvenc");
     if (enc == NULL)
     {
-        printf("couldn't find encoder\n");
+        PRINT_ERR("couldn't find encoder\n");
         return -1;
     }
     e->enc_ctx = avcodec_alloc_context3(enc);
@@ -49,13 +61,9 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     e->enc_ctx->framerate = (AVRational){60, 1};
     e->enc_ctx->time_base = (AVRational){1, 60};
     e->enc_ctx->bit_rate = 15000000;
-    e->enc_ctx->gop_size = 20;
+    e->enc_ctx->gop_size = 140;
     e->enc_ctx->max_b_frames = 0;
-#ifdef USE_YUV
-    e->enc_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
-#else
-    e->enc_ctx->pix_fmt = AV_PIX_FMT_0BGR32;
-#endif
+    e->enc_ctx->pix_fmt = OUTPUT_PIX_FMT;
     ret = av_opt_set(e->enc_ctx->priv_data, "preset", "llhq", 0);
     ret = av_opt_set(e->enc_ctx->priv_data, "rc", "cbr_ld_hq", 0);
     ret = av_opt_set_int(e->enc_ctx->priv_data, "zerolatency", 1, 0);
@@ -70,7 +78,7 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     ret = avcodec_open2(e->enc_ctx, enc, NULL);
     if (ret < 0)
     {
-        printf("avcodec_open2 failed\n");
+        PRINT_ERR("avcodec_open2 failed\n");
         return -1;
     }
 
@@ -82,14 +90,10 @@ static int ffmpeg_initialize(struct ouvr_ctx *ctx)
     ret = av_image_alloc(e->frame->data, e->frame->linesize, e->enc_ctx->width, e->enc_ctx->height, e->enc_ctx->pix_fmt, 32);
     if (ret < 0)
     {
-        printf("av_image_alloc() failed\n");
+        PRINT_ERR("av_image_alloc() failed\n");
         return -1;
     }
-#ifdef USE_YUV
-    e->rgb_to_yuv_ctx = sws_getContext(WIDTH, HEIGHT, AV_PIX_FMT_RGB24, WIDTH, HEIGHT, AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR, NULL, NULL, NULL);
-#else
-    e->rgb_to_yuv_ctx = sws_getContext(WIDTH, HEIGHT, AV_PIX_FMT_RGB0, WIDTH, HEIGHT, AV_PIX_FMT_0BGR32, SWS_FAST_BILINEAR, NULL, NULL, NULL);
-#endif
+    e->rgb_to_yuv_ctx = sws_getContext(WIDTH, HEIGHT, INPUT_PIX_FMT, WIDTH, HEIGHT, OUTPUT_PIX_FMT, SWS_FAST_BILINEAR, NULL, NULL, NULL);
     return 0;
 }
 
@@ -113,12 +117,15 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     }
     else if (ret != -11)
     {
-        printf("avcodec_receive_packet error: %d\n", ret);
+        PRINT_ERR("avcodec_receive_packet error: %d\n", ret);
         return -1;
     }
 
-    unsigned char *src = ctx->pix_buf;
+    const uint8_t *const src = ctx->pix_buf;
     sws_scale(e->rgb_to_yuv_ctx, &src, srcstride, 0, HEIGHT, frame->data, frame->linesize);
+#ifdef MEASURE_SSIM
+    py_ssim_set_ref_image_data((unsigned char *)frame->data[0]);
+#endif
 
     frame->pts = e->idx++;
     if (ctx->flag_send_iframe > 0)
@@ -138,7 +145,7 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
     ret = avcodec_send_frame(enc_ctx, frame);
     if (ret != 0 && ret != -11)
     {
-        printf("avcodec_send_frame() failed: %d\n", ret);
+        PRINT_ERR("avcodec_send_frame() failed: %d\n", ret);
         return -1;
     }
 
@@ -146,8 +153,10 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 }
 static void ffmpeg_deinitialize(struct ouvr_ctx *ctx)
 {
-    void *fdsa = ctx;
-    printf("fdsa %p\n", fdsa);
+    ffmpeg_encode_context *e = ctx->enc_priv;
+    avcodec_free_context(&e->enc_ctx);
+    free(e);
+    ctx->enc_priv = NULL;
 }
 
 struct ouvr_encoder ffmpeg_encode = {

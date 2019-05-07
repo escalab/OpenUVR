@@ -40,7 +40,7 @@ static int udp_initialize(struct ouvr_ctx *ctx)
     c->fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (c->fd < 0)
     {
-        printf("Couldn't create udp socket\n");
+        PRINT_ERR("Couldn't create udp socket\n");
         return -1;
     }
 
@@ -54,12 +54,12 @@ static int udp_initialize(struct ouvr_ctx *ctx)
 
     if (bind(c->fd, (struct sockaddr *)&c->serv_addr, sizeof(c->serv_addr)) < 0)
     {
-        printf("Couldn't bind udp\n");
+        PRINT_ERR("Couldn't bind udp\n");
         return -1;
     }
     if (connect(c->fd, (struct sockaddr *)&c->cli_addr, sizeof(c->cli_addr)) < 0)
     {
-        printf("Couldn't connect udp\n");
+        PRINT_ERR("Couldn't connect udp\n");
         return -1;
     }
     int flags = fcntl(c->fd, F_GETFL, 0);
@@ -85,7 +85,7 @@ static int udp_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
         r = sendmsg(c->fd, &c->msg, 0);
         if (r < -1)
         {
-            printf("Error on sendmsg: %ld\n", r);
+            PRINT_ERR("sendmsg returned: %ld\n", r);
             return -1;
         }
         else if (r > 0)

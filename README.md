@@ -19,8 +19,38 @@ From the `OpenUVR/sending/` directory, run `make` to compile the OpenUVR shared 
 
 `OpenUVR` can be compiled to output the moving average of recent timings. To compile it to output the average encoding time (i.e. the time elapsed from starting to send the RGB bytes to FFmpeg until receiving the encoded frame from FFmpeg), use `make TIME_FLAGS=-DTIME_ENCODING`. To have it output the average network time, use `make TIME_FLAGS=-DTIME_NETWORK`. To do both, do `make TIME_FLAGS="-DTIME_NETWORK -DTIME_ENCODING"`
 
+### Compiling Unreal Tournament
+1. The source code for Unreal Tournament is accessed on Github by requesting permission from Epic Games. Instructions are at https://github.com/EpicGames/Signup and setup requires an Epic Games account.
+2. Once access is granted to the Epic Games repositories, download the repository at https://github.com/EpicGames/UnrealTournament and follow the instructions given at https://wiki.unrealengine.com/Building_On_Linux to compile it for Linux.
+3. To verify that it was compiled correctly, from the base directory of the Unreal Tournament repository run `./Engine/Binaries/Linux/UE4Editor ./UnrealTournament/UnrealTournament.uproject`. If a window pops up warning that some modules are missing or built incorrectly, then click 'Yes' to build those modules. After it compiles those modules, it should start building game objects for a long time, then the editor window should open.
+4. Now it's time to modify the Engine code to call OpenUVR, and then recompile the UE4Editor. (Note: I have so far been unable to compile a standalone executable of Unreal Tournament, so UE4Editor will be the executable used whenever launching the game). There are potentially several places to add our OpenUVR code, but I have chosen to modify `Engine/Source/Runtime/OpenGLDrv/Private/Linux/OpenGLLinux.cpp` so as to guarantee that OpenUVR will have access to the OpenGL context.
+   * First you need to add a directory with a C# build script to specify directories and external libraries required for OpenUVR. Do this by applying the patch `ue4openuvr.patch` using git apply. Then copy the openuvr.h file into `Engine/Source/ThirdParty/OpenUVR/`.
+   * In `Engine/Source/Runtime/OpenGLDrv/Private/Linux/OpenGLLinux.cpp` add `#include "openuvr.h"` (within a `extern "C" {}` closure) to access the "managed" OpenUVR functions. The managed OpenUVR functions handle setting up and keeping track of OpenGL framebuffers and it works with Unreal Tournament. However, there might be some games where you'd want to implement the OpenGL management code within the game's source code. For example, the managed functions run in multi-threaded mode, so if you want single-threaded mode then you'll have to call the other OpenUVR functions and handle OpenGL yourself.
+   * New code is to be inserted immediately before the `SDL_GL_SwapWindow` function call at the end of the `PlatformBlitToViewport` function (it should be the only instance of `SDL_GL_SwapWindow` in the file). The code should run `openuvr_managed_init(OPENUVR_ENCODER_H264_CUDA, OPENUVR_NETWORK_UDP);` the first time it is called, and it should run `openuvr_managed_copy_framebuffer();` for every frame afterwards. I accomplished this using the following code, although it can probably be improved:
+   ```
+   // near the top of the file:
+   extern "C"{
+   #include "openuvr.h"
+	void setup_openuvr(){openuvr_managed_init(OPENUVR_ENCODER_H264_CUDA, OPENUVR_NETWORK_UDP);}
+	void send_openuvr(){openuvr_managed_copy_framebuffer();}
+   }
+   ...
+   // right before SDL_GL_SwapWindow(): 
+   static bool is_inited = false;
+	if(!is_inited){
+		setup_openuvr();
+		is_inited=true;
+	}else{
+		send_openuvr();
+	}
+   ```
+5. Now to copy the compiled OpenUVR and FFmpeg libraries so they can be used by Unreal Tournament. Create the directory `Engine/Binaries/ThirdParty/OpenUVR/` and create the `libs/` directory within it. Place within `libs/` the compiled shared libraries `libopenuvr.so` and everything in the `ffmpeg_build/lib/` directory. I prefer to accomplish this by using a script which copies the files to the directory every time OpenUVR is built, but you can also accomplish this using symbolic links.
+
+### Running Unreal Tournament in SSIM Mode
+Measuring the SSIM values of encoded frames requires a great deal of overhead, so conditional compilation of OpenUVR is required. To compile OpenUVR in SSIM Mode, use `make MODE_MEASURE_SSIM=1`. When OpenUVR is compiled in this way, it is hard-coded to run a SSIM-measuring module (`ssim_dummy_net.c`) instead of whichever network module the user selected. When the game is executed, it will do nothing for a set number of frames in order to give the user time to navigate the menus and start a game. Then, it will record 150 successive frames, encode and decode them, then measure and output to the console the average SSIM score for each batch of 10 frames, and then it will output the SSIM average for all 150 frames. It will subsequently allow a set number of frames to pass before recording and analyzing frames again.
+
 ### Compiling IOQuake3
-IOQuake3 is the game we're using to to run OpenUVR. It is open source and runs on Linux, so we need to download the source code, modify it to use OpenUVR, then compile and run it.
+IOQuake3 is the first game we modified to run OpenUVR, but it is less preferable to Unreal Tournament.
 
 1. The latest ioq3 is included as a submodule in `OpenUVR/quake/ioq3`. If you haven't yet updated the git submodules as instructed above, use `git submodule init && git submodule update`.
 2. Edit `OpenUVR/quake/ioq3/Makefile`. Under the `SETUP AND BUILD -- LINUX` section, replace the `RENDERER_LIBS=...` line (should be around line 396) with `RENDERER_LIBS = $(SDL_LIBS) -lGL`. Also replace the `LIBS=...` line just above that with the following 3 lines:

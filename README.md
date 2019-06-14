@@ -45,9 +45,14 @@ From the `OpenUVR/sending/` directory, run `make` to compile the OpenUVR shared 
 	}
    ```
 5. Now to copy the compiled OpenUVR and FFmpeg libraries so they can be used by Unreal Tournament. Create the directory `Engine/Binaries/ThirdParty/OpenUVR/` and create the `libs/` directory within it. Place within `libs/` the compiled shared libraries `libopenuvr.so` and everything in the `ffmpeg_build/lib/` directory. I prefer to accomplish this by using a script which copies the files to the directory every time OpenUVR is built, but you can also accomplish this using symbolic links.
+6. Run the game using the command `./Engine/Binaries/Linux/UE4Editor ./UnrealTournament/UnrealTournament.uproject -game`
 
-### Running Unreal Tournament in SSIM Mode
+### Running Unreal Tournament with OpenUVR in SSIM Mode
 Measuring the SSIM values of encoded frames requires a great deal of overhead, so conditional compilation of OpenUVR is required. To compile OpenUVR in SSIM Mode, use `make MODE_MEASURE_SSIM=1`. When OpenUVR is compiled in this way, it is hard-coded to run a SSIM-measuring module (`ssim_dummy_net.c`) instead of whichever network module the user selected. When the game is executed, it will do nothing for a set number of frames in order to give the user time to navigate the menus and start a game. Then, it will record 150 successive frames, encode and decode them, then measure and output to the console the average SSIM score for each batch of 10 frames, and then it will output the SSIM average for all 150 frames. It will subsequently allow a set number of frames to pass before recording and analyzing frames again.
+
+The SSIM code relies on Python 3, so after compiling OpenUVR in SSIM mode you must make sure that the python3.5 library is linked to Unreal Tournament. My recommended way of using python is to use virtualenv. To do so, install virtualenv with `pip install virtualenv`. Then run `virtualenv --system-site-packages -p python3 ./ANY_DESTINATION_FOLDER_YOU_CHOOSE`. To enter the virtual environment, run `source ./ANY_DESTINATION_FOLDER_YOU_CHOOSE/bin/activate`, then use `pip install tensorflow tensorflow-gpu`.
+
+Then, you should just be able to run the game as normal. Use `deactivate` when you wish to exit the virtual environment.
 
 ### Compiling IOQuake3
 IOQuake3 is the first game we modified to run OpenUVR, but it is less preferable to Unreal Tournament.

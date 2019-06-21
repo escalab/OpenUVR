@@ -9,8 +9,16 @@ FFmpeg is included in OpenUVR as a git submodule. It is set to track version 4.0
 1. Clone the `OpenUVR` repository anywhere in your home directory on the host machine.
 2. `cd OpenUVR/sending`
 3. `git submodule init && git submodule update`. This will download the FFmpeg code from the repository at https://github.com/FFmpeg/FFmpeg.git and will place it into the `OpenUVR/sending/FFmpeg/` directory.
-3. You'll need to apply the `bgr0_ffmpeg.patch` to add support for CUDA encoding in RGBA format, which is supported by NVIDIA but not FFMPEG by default. Enter the `FFmpeg/` directory, run `git apply ../bgr0_ffmpeg.patch` to apply the patch, then leave that directory.
-3. From `OpenUVR/sending`, run `make ffmpeg`. This command will enter the `OpenUVR/sending/FFmpeg/` directory, run the `configure` script with specific parameters, then run `make` and `make install`. This will install files to the `OpenUVR/sending/ffmpeg_build/` directory. In the future, you may need to configure FFmpeg differently by changing the configure parameters listed in `OpenUVR/sending/Makefile`.
+4. `sudo apt-get install ffmpeg`. FFmpeg PC-wide installation
+5. `sudo apt-get install libass-dev libfdk-aac-dev libmp3lame-dev libx264-dev libx265-dev`. This will install all the encoder libraries used in OpenUVR.
+6. You will need to apply the `bgr0_ffmpeg.patch` to add support for CUDA encoding in RGBA format, which is supported by NVIDIA but not FFMPEG by default. Enter the `FFmpeg/` directory, run `git apply ../bgr0_ffmpeg.patch` to apply the patch, then leave that directory.
+7. CUDA encoding relies on the dependency `ffnvcodec`, which can be installed with these steps:
+   1. `git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git`
+   2. `cd nv-codec-headers`
+   3. `make`
+   4. `sudo make install`
+   5. `export PKG_CONFIG_PATH='path/to/lib/pkgconfig'` This is not required, but will fix the issue if step 8 returns the error `ERROR: cuda requested, but not all dependencies are satisfied: ffnvcodec`
+8. From `OpenUVR/sending`, run `make ffmpeg`. This command will enter the `OpenUVR/sending/FFmpeg/` directory, run the `configure` script with specific parameters, then run `make` and `make install`. This will install files to the `OpenUVR/sending/ffmpeg_build/` directory. In the future, you may need to configure FFmpeg differently by changing the configure parameters listed in `OpenUVR/sending/Makefile`.
 
 This will install static and shared libraries to the `OpenUVR/sending/ffmpeg_build/lib` directory. IOQuake3 will need to be compiled with these libraries, and they must be specified when running it. This will be described below in `Compiling IOQuake3`.
 

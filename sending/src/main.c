@@ -8,6 +8,8 @@
 #include <time.h>
 #include <sys/shm.h>
 
+#include <dlfcn.h>
+
 void usage()
 {
     printf("Usage: sudo ./openuvr [h264 | rgb] [tcp | udp | udp-compat | raw]\n");
@@ -33,14 +35,17 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    key_t shm_key = 5678;
-    int shm_id = shmget(shm_key, 1920 * 1080 * 4, 0666);
-    unsigned char *src = shmat(shm_id, NULL, 0);
-    if (src == NULL)
-    {
-        printf("couldn't get shared memory\n");
-        return -1;
-    }
+    // key_t shm_key = 5678;
+    // int shm_id = shmget(shm_key, 1920 * 1080 * 4, 0666);
+    // unsigned char *src = shmat(shm_id, NULL, 0);
+    // if (src == NULL)
+    // {
+    //     printf("couldn't get shared memory\n");
+    //     return -1;
+    // }
+
+    unsigned char *src = malloc(1920 * 1080 * 4);
+    memset(src, 100, 1920 * 1080 * 4);
 
     if (!strcmp("h264", argv[1]))
     {
@@ -74,14 +79,25 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    context = openuvr_alloc_context(enc_choice, net_choice, src);
+    void *handle = dlopen("libopenuvr.so", RTLD_LAZY);
+    if (handle == NULL)
+    {
+        printf("null\n");
+        exit(1);
+    }
+    struct openuvr_context *(*openuvr_alloc)(enum OPENUVR_ENCODER_TYPE, enum OPENUVR_NETWORK_TYPE, unsigned char *, unsigned int);
+    openuvr_alloc = dlsym(handle, "openuvr_alloc_context");
+    int (*openuvr_init)(struct openuvr_context *);
+    openuvr_init = dlsym(handle, "openuvr_init_thread_continuous");
+
+    context = openuvr_alloc(enc_choice, net_choice, src, 0);
     if (context == NULL)
     {
         usage();
         return 1;
     }
 
-    openuvr_init_thread_continuous(context);
+    openuvr_init(context);
 
     for (;;)
     {

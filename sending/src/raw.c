@@ -1,4 +1,4 @@
-#include "udp.h"
+#include "raw.h"
 #include "ouvr_packet.h"
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,14 +22,14 @@
 
 typedef struct raw_net_context
 {
-    unsigned char eth_header[14];
+    uint8_t eth_header[14];
     int fd;
     struct sockaddr_ll raw_addr;
     struct msghdr msg;
     struct iovec iov[3];
 } raw_net_context;
 
-unsigned char const global_eth_header[14] = {0xb8, 0x27, 0xeb, 0x6c, 0xa7, 0xdd, 0x00, 0x0e, 0x8e, 0x5c, 0x2e, 0x53, 0x88, 0xb5};
+static uint8_t const global_eth_header[14] = {0xb8, 0x27, 0xeb, 0x6c, 0xa7, 0xdd, 0x00, 0x0e, 0x8e, 0x5c, 0x2e, 0x53, 0x88, 0xb5};
 
 static int raw_initialize(struct ouvr_ctx *ctx)
 {
@@ -77,7 +77,7 @@ static int raw_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     raw_net_context *c = ctx->net_priv;
     register ssize_t r;
-    unsigned char *start_pos = pkt->data;
+    uint8_t *start_pos = pkt->data;
     int offset = 0;
     c->iov[1].iov_len = sizeof(pkt->size);
     c->iov[1].iov_base = &(pkt->size);

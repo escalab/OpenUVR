@@ -26,19 +26,17 @@ static int rgb_initialize(struct ouvr_ctx *ctx)
     return 0;
 }
 
-#include <time.h>
-
 static int rgb_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
-    //wait a little longer for receiving side to keep up
-    struct timespec wait_time = {.tv_sec = 0, .tv_nsec = 80000000};
-    nanosleep(&wait_time, NULL);
-
-    for (int x = 0; x < 1080; x++)
+    int offset_src = 0;
+    int offset_dst = 0;
+    for (int y = 0; y < 1080; y++)
     {
-        for (int y = 0; y < 1920 * 3; y += 8)
+        for (int x = 0; x < 1920; x++)
         {
-            *(long *)(pkt->data + 1920 * 3 * (1079 - x) + y) = *(long *)(ctx->pix_buf + 1920 * 3 * x + y);
+            *(int *)(pkt->data + offset_dst) = *(int *)(ctx->pix_buf + offset_src);
+            offset_src += 4;
+            offset_dst += 3;
         }
     }
 
@@ -49,8 +47,7 @@ static int rgb_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 }
 static void rgb_deinitialize(struct ouvr_ctx *ctx)
 {
-    void *fdsa = ctx;
-    printf("rgb_deinitialize was called but is unimplemented %p\n", fdsa);
+    free(ctx->enc_priv);
 }
 
 struct ouvr_encoder rgb_encode = {

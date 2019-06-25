@@ -1,2 +1,4 @@
 openuvr
 ffmpeg_build/
+ssim_plugin.c
+ssim_plugin.h

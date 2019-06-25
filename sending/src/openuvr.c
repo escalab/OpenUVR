@@ -3,12 +3,15 @@
 #include "tcp.h"
 #include "udp.h"
 #include "raw.h"
+#include "raw_ring.h"
 #include "udp_compat.h"
+#include "inject.h"
 #include "ffmpeg_encode.h"
 #include "ffmpeg_cuda_encode.h"
 #include "rgb_encode.h"
 #include "ffmpeg_audio.h"
 #include "asoundlib_audio.h"
+#include "pulse_audio.h"
 #include "feedback_net.h"
 #include "input_recv.h"
 #include "ssim_dummy_net.h"
@@ -39,6 +42,12 @@ struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type
     case OPENUVR_NETWORK_RAW:
         ctx->net = &raw_handler;
         break;
+    case OPENUVR_NETWORK_RAW_RING:
+        ctx->net = &raw_ring_handler;
+        break;
+    case OPENUVR_NETWORK_INJECT:
+        ctx->net = &inject_handler;
+        break;
     case OPENUVR_NETWORK_UDP_COMPAT:
         ctx->net = &udp_compat_handler;
         break;
@@ -46,6 +55,9 @@ struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type
     default:
         ctx->net = &udp_handler;
     }
+#ifdef MEASURE_SSIM
+    ctx->net = &ssim_dummy_net_handler;
+#endif
     if (ctx->net->init(ctx) != 0)
     {
         goto err;
@@ -71,7 +83,7 @@ struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type
         goto err;
     }
 
-    // ctx->aud = &asoundlib_audio;
+    // ctx->aud = &pulse_audio;
     // if (ctx->aud->init(ctx) != 0)
     // {
     //     goto err;
@@ -91,9 +103,11 @@ err:
     free(ret);
     return NULL;
 }
+
 #ifdef TIME_ENCODING
 float avg_enc_time = 0;
 #endif
+
 int openuvr_send_frame(struct openuvr_context *context)
 {
     int ret;
@@ -105,14 +119,14 @@ int openuvr_send_frame(struct openuvr_context *context)
     // ret = ctx->aud->encode_frame(ctx, ctx->packet);
     // if (ret < 0)
     // {
-    //     return 1;
+    //     return -1;
     // }
     // else if (ret > 0)
     // {
     //     ret = ctx->net->send_packet(ctx, ctx->packet);
     //     if (ret < 0)
     //     {
-    //         return 1;
+    //         return -1;
     //     }
     // }
 

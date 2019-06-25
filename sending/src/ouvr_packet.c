@@ -3,7 +3,7 @@
 
 struct ouvr_packet *ouvr_packet_alloc() {
     struct ouvr_packet *pkt = malloc(sizeof(struct ouvr_packet));
-    pkt->data = malloc(1000000);
+    pkt->data = malloc(10000000);
     pkt->size = 0;
     return pkt;
 }

@@ -6,7 +6,6 @@
 
 #include "ffmpeg_encode.h"
 #include "ouvr_packet.h"
-#include "ssim_plugin.h"
 
 #define WIDTH 1920
 #define HEIGHT 1080
@@ -15,7 +14,6 @@
 // #define OUTPUT_YUV
 /* input defaults to RGBA, but uncomment following line to handle RGB input */
 // #define INPUT_RGB
-// #define MEASURE_SSIM
 
 typedef struct ffmpeg_encode_context
 {
@@ -123,9 +121,6 @@ static int ffmpeg_process_frame(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 
     const uint8_t *const src = ctx->pix_buf;
     sws_scale(e->rgb_to_yuv_ctx, &src, srcstride, 0, HEIGHT, frame->data, frame->linesize);
-#ifdef MEASURE_SSIM
-    py_ssim_set_ref_image_data((unsigned char *)frame->data[0]);
-#endif
 
     frame->pts = e->idx++;
     if (ctx->flag_send_iframe > 0)

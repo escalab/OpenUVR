@@ -35,15 +35,15 @@ struct ieee80211_hdr
 #define WLAN_FC_SUBTYPE_DATA 0
 
 static const uint8_t u8aRadiotapHeader[] = {0x00, 0x00, 0x18, 0x00, 0x0f, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /*0x10 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08, 0x00};
-const unsigned char ipllc[8] = {0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x88, 0xb5};
-static unsigned char *header_buf;
-static unsigned char *data;
+const uint8_t ipllc[8] = {0xaa, 0xaa, 0x03, 0x00, 0x00, 0x00, 0x88, 0xb5};
+static uint8_t *header_buf;
+static uint8_t *data;
 
 static long header_size;
 
 typedef struct inject_net_context
 {
-    unsigned char eth_header[14];
+    uint8_t eth_header[14];
     int fd;
     struct sockaddr_ll inject_addr;
     struct msghdr msg;
@@ -135,7 +135,7 @@ static int inject_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     inject_net_context *c = ctx->net_priv;
     register ssize_t r;
-    unsigned char *start_pos = pkt->data;
+    uint8_t *start_pos = pkt->data;
     int offset = 0;
     int data_size = SEND_SIZE;
     memcpy(data, &pkt->size, 4);

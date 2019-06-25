@@ -9,7 +9,7 @@
 typedef struct ssim_dummy_net_context
 {
     AVCodecContext *dec_ctx;
-    unsigned char *grayscale_buf;
+    uint8_t *grayscale_buf;
 } ssim_dummy_net_context;
 
 enum AVPixelFormat myGetFormat(struct AVCodecContext *s, const enum AVPixelFormat *fmt)

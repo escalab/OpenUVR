@@ -29,7 +29,7 @@ typedef struct pthread_context
     pthread_t send_thread;
 } ouvr_pthread_context;
 
-struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type, enum OPENUVR_NETWORK_TYPE net_type, unsigned char *pix_buf, unsigned int pbo)
+struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type, enum OPENUVR_NETWORK_TYPE net_type, uint8_t *pix_buf, unsigned int pbo)
 {
     struct openuvr_context *ret = calloc(1, sizeof(struct openuvr_context));
     struct ouvr_ctx *ctx = calloc(1, sizeof(struct ouvr_ctx));

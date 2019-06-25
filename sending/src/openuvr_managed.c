@@ -20,14 +20,14 @@
 static AVFrame *frame = NULL;
 static int const srcstride[1] = {1920 * 4};
 struct SwsContext *swsctx;
-static unsigned char *saved_frames[NUM_SAVED_FRAMES];
+static uint8_t *saved_frames[NUM_SAVED_FRAMES];
 static int cur_frame = 0;
 static int num_intermediary_frames = 3000;
-static unsigned char *y_buf;
+static uint8_t *y_buf;
 #endif
 
 static GLuint pbo = 0;
-static unsigned char *cpu_encoding_buf = NULL;
+static uint8_t *cpu_encoding_buf = NULL;
 struct openuvr_context *ctx = NULL;
 
 int openuvr_managed_init(enum OPENUVR_ENCODER_TYPE enc_type, enum OPENUVR_NETWORK_TYPE net_type)
@@ -52,7 +52,7 @@ int openuvr_managed_init(enum OPENUVR_ENCODER_TYPE enc_type, enum OPENUVR_NETWOR
     else
     {
 
-        cpu_encoding_buf = (unsigned char *)malloc(1920 * 1080 * 4);
+        cpu_encoding_buf = (uint8_t *)malloc(1920 * 1080 * 4);
         glReadPixels(0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, cpu_encoding_buf);
     }
 
@@ -109,7 +109,7 @@ void openuvr_managed_copy_framebuffer()
             return;
         }
 
-        unsigned char *pix = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 1920 * 1080 * 4, GL_MAP_READ_BIT);
+        uint8_t *pix = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 1920 * 1080 * 4, GL_MAP_READ_BIT);
         memcpy(saved_frames[cur_frame], pix, 1920 * 1080 * 4);
         glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
 
@@ -120,7 +120,7 @@ void openuvr_managed_copy_framebuffer()
                 sws_scale(swsctx, &saved_frames[i], srcstride, 0, 1080, frame->data, frame->linesize);
                 py_ssim_set_ref_image_data(frame->data[0]);
 
-                unsigned char *pix = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 1920 * 1080 * 4, GL_MAP_WRITE_BIT);
+                uint8_t *pix = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, 1920 * 1080 * 4, GL_MAP_WRITE_BIT);
                 memcpy(pix, saved_frames[i], 1920 * 1080 * 4);
                 glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
                 openuvr_cuda_copy(ctx);

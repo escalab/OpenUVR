@@ -1,6 +1,8 @@
 #ifndef OPENUVR_MAIN_H
 #define OPENUVR_MAIN_H
 
+#include <stdint.h>
+
 enum OPENUVR_NETWORK_TYPE
 {
     OPENUVR_NETWORK_TCP,
@@ -23,7 +25,7 @@ struct openuvr_context
     void *priv;
 };
 
-struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type, enum OPENUVR_NETWORK_TYPE net_type, unsigned char *pix_buf, unsigned int pbo);
+struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type, enum OPENUVR_NETWORK_TYPE net_type, uint8_t *pix_buf, unsigned int pbo);
 int openuvr_send_frame(struct openuvr_context *context);
 int openuvr_init_thread(struct openuvr_context *context);
 int openuvr_init_thread_continuous(struct openuvr_context *context);

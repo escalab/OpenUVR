@@ -71,7 +71,7 @@ static int udp_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
 {
     udp_compat_net_context *c = ctx->net_priv;
     register ssize_t r;
-    unsigned char *start_pos = pkt->data;
+    uint8_t *start_pos = pkt->data;
     int offset = 0;
     c->iov[0].iov_len = SEND_SIZE;
     while (offset < pkt->size)

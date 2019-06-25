@@ -37,14 +37,14 @@ int main(int argc, char **argv)
 
     // key_t shm_key = 5678;
     // int shm_id = shmget(shm_key, 1920 * 1080 * 4, 0666);
-    // unsigned char *src = shmat(shm_id, NULL, 0);
+    // uint8_t *src = shmat(shm_id, NULL, 0);
     // if (src == NULL)
     // {
     //     printf("couldn't get shared memory\n");
     //     return -1;
     // }
 
-    unsigned char *src = malloc(1920 * 1080 * 4);
+    uint8_t *src = malloc(1920 * 1080 * 4);
     memset(src, 100, 1920 * 1080 * 4);
 
     if (!strcmp("h264", argv[1]))
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
         printf("null\n");
         exit(1);
     }
-    struct openuvr_context *(*openuvr_alloc)(enum OPENUVR_ENCODER_TYPE, enum OPENUVR_NETWORK_TYPE, unsigned char *, unsigned int);
+    struct openuvr_context *(*openuvr_alloc)(enum OPENUVR_ENCODER_TYPE, enum OPENUVR_NETWORK_TYPE, uint8_t *, unsigned int);
     openuvr_alloc = dlsym(handle, "openuvr_alloc_context");
     int (*openuvr_init)(struct openuvr_context *);
     openuvr_init = dlsym(handle, "openuvr_init_thread_continuous");

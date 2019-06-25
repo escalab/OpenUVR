@@ -80,7 +80,7 @@ static int tcp_send_packet(struct ouvr_ctx *ctx, struct ouvr_packet *pkt)
         return 0;
     }
 
-    unsigned char *pos = pkt->data;
+    uint8_t *pos = pkt->data;
     while (nleft > 0)
     {
         r = write(c->send_fd, pos, nleft);

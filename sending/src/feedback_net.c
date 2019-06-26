@@ -1,3 +1,6 @@
+/**
+ * Handles UDP signals received from MUD to signify that a frame was dropped so the encoder should create and send an I-frame.
+ */
 #include "udp.h"
 #include "ouvr_packet.h"
 #include <unistd.h>

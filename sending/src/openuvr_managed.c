@@ -1,3 +1,9 @@
+/**
+ * Handles all the nitty-gritty of OpenGL.
+ * Call openuvr_managed_init() from a location where the active OpenGL context is the context that includes the game screen's framebuffer.
+ * Call openuvr_managed_copy_framebuffer() from a function which is called at every frame and also has the same OpenGL context as openuvr_managed_init().
+ * If the host program uses SDL, you can put this function immediately before SDL_GL_SwapWindow() since it reads from the back buffer, so calling it in this way will copy the pixels beofre they're displayed on the screen.
+ */
 #include "openuvr.h"
 #include "ouvr_packet.h"
 #include <stdlib.h>
@@ -99,6 +105,7 @@ void openuvr_managed_copy_framebuffer()
             glBufferData(GL_PIXEL_PACK_BUFFER, 1920 * 1080 * 4, 0, GL_DYNAMIC_COPY);
         }
 
+        glReadBuffer(GL_BACK);
         glReadPixels(0, 0, 1920, 1080, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 //To enable SSIM measurement, compile with "make MODE_MEASURE_SSIM=1"

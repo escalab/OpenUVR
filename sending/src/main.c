@@ -99,9 +99,8 @@ int main(int argc, char **argv)
 
     openuvr_init(context);
 
-    for (;;)
-    {
-        //do nothing
-    }
+    // openuvr_init() spawned a new thread, and this thread doesn't have anything else to do so suspend it to save CPU rather than using an empty infinite loop.
+    pause();
+
     return 0;
 }

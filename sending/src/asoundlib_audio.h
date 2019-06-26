@@ -1,3 +1,7 @@
+/**
+ * Here for reference but should not be used.
+ */
+/*
 #ifndef ASOUNDLIB_AUDIO_H
 #define ASOUNDLIB_AUDIO_H
 
@@ -6,3 +10,4 @@
 struct ouvr_audio asoundlib_audio;
 
 #endif
+*/

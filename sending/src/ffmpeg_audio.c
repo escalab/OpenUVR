@@ -1,3 +1,7 @@
+/**
+ * Here for posterity but only works with snd-aloop kernel module. A better solution is to use pulse_audio.c
+ */
+/*
 #include "include/libavcodec/avcodec.h"
 #include "include/libavdevice/avdevice.h"
 #include "include/libavutil/avutil.h"
@@ -174,3 +178,4 @@ struct ouvr_audio ffmpeg_audio = {
     .encode_frame = ffmpeg_process_frame,
     .deinit = ffmpeg_deinitialize,
 };
+*/

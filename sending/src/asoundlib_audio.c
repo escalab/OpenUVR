@@ -1,3 +1,8 @@
+/**
+ * First attempt to capture audio. Here for reference but it stopped working upon a linux update and it requires additional configuration to load "snd-aloop" kernel module and set it as the sink.
+ */
+
+/*
 #include "alsa/asoundlib.h"
 
 #include "asoundlib_audio.h"
@@ -120,3 +125,4 @@ struct ouvr_audio asoundlib_audio = {
     .encode_frame = asoundlib_process_frame,
     .deinit = asoundlib_deinitialize,
 };
+*/

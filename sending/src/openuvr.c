@@ -1,3 +1,6 @@
+/**
+ * Contains the primary entry points to OpenUVR. Using these functions requires the caller to manage OpenGL buffers and copy data from them. For functions which handle everything themselves, see "openuvr_managed.c".
+ */
 #include "openuvr.h"
 #include "ouvr_packet.h"
 #include "tcp.h"
@@ -9,8 +12,6 @@
 #include "ffmpeg_encode.h"
 #include "ffmpeg_cuda_encode.h"
 #include "rgb_encode.h"
-#include "ffmpeg_audio.h"
-#include "asoundlib_audio.h"
 #include "pulse_audio.h"
 #include "feedback_net.h"
 #include "input_recv.h"
@@ -83,6 +84,7 @@ struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type
         goto err;
     }
 
+    //// commented out since pulse_audio currently freezes. Uncomment to re-enable audio
     // ctx->aud = &pulse_audio;
     // if (ctx->aud->init(ctx) != 0)
     // {
@@ -116,6 +118,7 @@ int openuvr_send_frame(struct openuvr_context *context)
     struct timeval start, end;
 #endif
 
+    //// Uncomment to re-enable audio capture and sending:
     // ret = ctx->aud->encode_frame(ctx, ctx->packet);
     // if (ret < 0)
     // {

@@ -1,0 +1,111 @@
+diff --git a/Engine/Source/Runtime/OpenGLDrv/OpenGLDrv.Build.cs b/Engine/Source/Runtime/OpenGLDrv/OpenGLDrv.Build.cs
+index fc89ab8..6aa200c 100644
+--- a/Engine/Source/Runtime/OpenGLDrv/OpenGLDrv.Build.cs
++++ b/Engine/Source/Runtime/OpenGLDrv/OpenGLDrv.Build.cs
+@@ -25,6 +25,7 @@ public class OpenGLDrv : ModuleRules
+ 
+         if (Target.Platform != UnrealTargetPlatform.HTML5)
+ 		    AddEngineThirdPartyPrivateStaticDependencies(Target, "OpenGL");
++		    AddEngineThirdPartyPrivateStaticDependencies(Target, "OpenUVR");
+ 
+ 		if (Target.Platform == UnrealTargetPlatform.HTML5 && Target.Architecture == "-win32")
+ 		{ 
+diff --git a/Engine/Source/ThirdParty/OpenUVR/OpenUVR.Build.cs b/Engine/Source/ThirdParty/OpenUVR/OpenUVR.Build.cs
+new file mode 100644
+index 0000000..2ec63bd
+--- /dev/null
++++ b/Engine/Source/ThirdParty/OpenUVR/OpenUVR.Build.cs
+@@ -0,0 +1,71 @@
++using UnrealBuildTool;
++using System;
++public class OpenUVR : ModuleRules
++{
++	public OpenUVR(TargetInfo Target)
++	{
++		Type = ModuleType.External;
++		string OUVR_path = "$(EngineDir)/Binaries/ThirdParty/OpenUVR/libs/";
++		Console.WriteLine(UEBuildConfiguration.UEThirdPartyBinariesDirectory + "OpenUVR/libs/");
++		//PublicLibraryPaths.Add();
++
++		PublicSystemIncludePaths.Add("$(EngineDir)/Source/ThirdParty/OpenUVR/");
++
++		PublicLibraryPaths.Add(UEBuildConfiguration.UEThirdPartyBinariesDirectory + "OpenUVR/libs/");
++		PublicAdditionalLibraries.Add(UEBuildConfiguration.UEThirdPartyBinariesDirectory + "OpenUVR/libs/"+"libopenuvr.so");
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libopenuvr.so"));
++
++		PublicAdditionalLibraries.Add("cuda");
++		//RuntimeDependencies.Add(new RuntimeDependency("/usr/lib/x86_64-linux-gnu/libcuda.so"));
++
++		PublicAdditionalLibraries.Add("glut");
++		PublicAdditionalLibraries.Add("python3.5m");
++		//RuntimeDependencies.Add(new RuntimeDependency("/usr/lib/x86_64-linux-gnu/libglut.so"));
++
++
++		// PublicAdditionalLibraries.Add("pulse");
++		// PublicAdditionalLibraries.Add("pulse-simple");
++
++		PublicAdditionalLibraries.Add("ass");
++		PublicAdditionalLibraries.Add("SDL2-2.0");
++		PublicAdditionalLibraries.Add("sndio");
++		PublicAdditionalLibraries.Add("asound");
++		PublicAdditionalLibraries.Add("vdpau");
++		PublicAdditionalLibraries.Add("dl");
++		PublicAdditionalLibraries.Add("va");
++		PublicAdditionalLibraries.Add("va-drm");
++		PublicAdditionalLibraries.Add("Xext");
++		PublicAdditionalLibraries.Add("xcb-shm");
++		PublicAdditionalLibraries.Add("xcb-xfixes");
++		PublicAdditionalLibraries.Add("xcb-shape");
++		PublicAdditionalLibraries.Add("xcb");
++		PublicAdditionalLibraries.Add("Xv");
++		PublicAdditionalLibraries.Add("freetype");
++		PublicAdditionalLibraries.Add("va-x11");
++		PublicAdditionalLibraries.Add("X11");
++		PublicAdditionalLibraries.Add("pthread");
++		PublicAdditionalLibraries.Add("m");
++		PublicAdditionalLibraries.Add("z");
++
++		PublicAdditionalLibraries.Add("avdevice");
++		PublicAdditionalLibraries.Add("avfilter");
++		PublicAdditionalLibraries.Add("avformat");
++		PublicAdditionalLibraries.Add("avcodec");
++		PublicAdditionalLibraries.Add("avutil");
++		PublicAdditionalLibraries.Add("swscale");
++		PublicAdditionalLibraries.Add("swresample");
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libavdevice.so"));
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libavfilter.so"));
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libavformat.so"));
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libavcodec.so"));
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libavutil.so"));
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libswscale.so"));
++		RuntimeDependencies.Add(new RuntimeDependency(OUVR_path + "libswresample.so"));
++
++
++		PublicAdditionalLibraries.Add("python3.5m");
++		RuntimeDependencies.Add(new RuntimeDependency("/usr/lib/x86_64-linux-gnu/libpython3.5m.so.1.0"));
++	}
++}
++
++//-L/usr/local/cuda/lib64 $(OPENUVR_FFMPEG_LIB_DIR)/../../src/libopenuvr.so -lcuda -lglut $(OPENUVR_FFMPEG_LIB_DIR)/libavdevice.so $(OPENUVR_FFMPEG_LIB_DIR)/libavfilter.so $(OPENUVR_FFMPEG_LIB_DIR)/libavformat.so $(OPENUVR_FFMPEG_LIB_DIR)/libavcodec.so $(OPENUVR_FFMPEG_LIB_DIR)/libavutil.so $(OPENUVR_FFMPEG_LIB_DIR)/libswscale.so $(OPENUVR_FFMPEG_LIB_DIR)/libswresample.so -lnppicc -lnppig -lnppc -lass -lSDL2-2.0 -lsndio -lasound -lvdpau -ldl -lva -lva-drm -lXext -lxcb-shm -lxcb-xfixes -lxcb-shape -lxcb -lXv -lfreetype $(OPENUVR_FFMPEG_LIB_DIR)/libpostproc.so -lva-x11 -lX11 -lpthread -lm -lz
+diff --git a/Engine/Source/ThirdParty/OpenUVR/OpenUVR.tps b/Engine/Source/ThirdParty/OpenUVR/OpenUVR.tps
+new file mode 100644
+index 0000000..576bb08
+--- /dev/null
++++ b/Engine/Source/ThirdParty/OpenUVR/OpenUVR.tps
+@@ -0,0 +1,15 @@
++﻿<?xml version="1.0" encoding="utf-8"?>
++<TpsData xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
++  <Name>OpenUVR 1.0</Name>
++  <Location>/Engine/Source/ThirdParty/OpenUVR/</Location>
++  <Date>2016-06-10T12:02:52.5030733-04:00</Date>
++  <Function>It's a good one.</Function>
++  <Justification>Needed for OpenUVR</Justification>
++  <Eula>http://example.com/index.html</Eula>
++  <RedistributeTo>
++    <EndUserGroup>Licensees</EndUserGroup>
++    <EndUserGroup>Git</EndUserGroup>
++    <EndUserGroup>P4</EndUserGroup>
++  </RedistributeTo>
++  <LicenseFolder>/Engine/Source/ThirdParty/Licenses/ICU51.2_License.txt</LicenseFolder>
++</TpsData>
+

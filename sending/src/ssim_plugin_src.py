@@ -20,46 +20,12 @@ for i in range(NUM_BUFS):
 cur_idx = 0
 cur_batch_num = 0
 
-# saves all NUM_BUFS image for each iteration to a file, to be read later by ssim_standalone.py
-
-
-def save_image_batch():
-    global cur_batch_num
-    print('------------------------Saving image batch %d-------------------------------' % cur_batch_num)
-    ref_out = io.open('/home/arrohlof/Pictures/ssim/ref%d' %
-                      cur_batch_num, 'wb')
-    cmp_out = io.open('/home/arrohlof/Pictures/ssim/cmp%d' %
-                      cur_batch_num, 'wb')
-    for i in range(NUM_BUFS):
-        ref_out.write(ref_img_data[i])
-        cmp_out.write(cmp_img_data[i])
-    ref_out.close()
-    cmp_out.close()
-
-    cur_batch_num += 1
-
-
-def save_yuv_values_as_text(index):
-    ref_out = io.open('/home/arrohlof/Pictures/ssim/ref_yuv.txt', 'w')
-    cmp_out = io.open('/home/arrohlof/Pictures/ssim/cmp_yuv.txt', 'w')
-
-    ref_to_be_written = ref_img_data[index]
-    cmp_to_be_written = cmp_img_data[index]
-
-    for i in range(len(ref_to_be_written)):
-        ref_out.write(str(ref_to_be_written[i])+' ')
-        cmp_out.write(str(cmp_to_be_written[i])+' ')
-    ref_out.close()
-    cmp_out.close()
-
 
 def compute_ssim():
     global ref_img_data, cmp_img_data
     print('------------------------Beginning to analyze ssim-------------------------------')
     # sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
     num_chunks = int(NUM_BUFS/10)
-
-    save_yuv_values_as_text(0)
 
     with tf.Graph().as_default(), tf.Session() as sess:
         ref_ph = tf.placeholder(tf.uint8, shape=[NUM_BUFS, 1920*1080])
@@ -112,4 +78,3 @@ def py_ssim_set_cmp_image_data_or_compute_ssim(buf):
     cur_idx = 0
 
     compute_ssim()
-    # save_image_batch()

@@ -14,7 +14,7 @@ libopenuvr.so: $(OBJS)
 	gcc -shared -L../ffmpeg_build/lib/ -Wl,--no-as-needed -lavcodec -lavfilter -lavformat -lavutil -lswresample -lswscale -lavdevice -o libopenuvr.so $(OBJS)
 	chmod -x libopenuvr.so
 
-FFMPEG_LIB_DIR=/home/arrohlof/transition/OpenUVR/sending/ffmpeg_build/lib
+FFMPEG_LIB_DIR=../ffmpeg_build/lib
 
 libopenuvr.a: $(OBJS)
 	ar rcs libopenuvr.a $(OBJS) $(FFMPEG_LIB_DIR)/libavdevice.a $(FFMPEG_LIB_DIR)/libavfilter.a $(FFMPEG_LIB_DIR)/libavformat.a $(FFMPEG_LIB_DIR)/libavcodec.a $(FFMPEG_LIB_DIR)/libavutil.a $(FFMPEG_LIB_DIR)/libswscale.a $(FFMPEG_LIB_DIR)/libswresample.a
@@ -23,7 +23,7 @@ libopenuvr.a: $(OBJS)
 	gcc $(CFLAGS) -c $< -o $@
 
 
-
+# auto-generated c source code to run python
 ssim_plugin.c: ssim_plugin_builder.py ssim_plugin_src.py ssim_plugin.h
 	python3 ssim_plugin_builder.py
 
@@ -39,4 +39,4 @@ install: libopenuvr.so
 
 .PHONY: clean
 clean:
-	@rm -f openuvr libopenuvr.a libopenuvr.so main.o $(OBJS)
+	@rm -f openuvr libopenuvr.a libopenuvr.so main.o ssim_plugin.c ssim_plugin.o $(OBJS)

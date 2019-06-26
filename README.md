@@ -10,7 +10,7 @@ FFmpeg is included in OpenUVR as a git submodule. It is set to track version 4.0
 2. `cd OpenUVR/sending`
 3. `git submodule init && git submodule update`. This will download the FFmpeg code from the repository at https://github.com/FFmpeg/FFmpeg.git and will place it into the `OpenUVR/sending/FFmpeg/` directory.
 4. `sudo apt-get install ffmpeg`. FFmpeg PC-wide installation
-5. `sudo apt-get install libass-dev libfdk-aac-dev libmp3lame-dev libx264-dev libx265-dev`. This will install all the encoder libraries used in OpenUVR.
+5. `sudo apt-get install libass-dev libfdk-aac-dev libmp3lame-dev libx264-dev libx265-dev libpulse-dev libgles2-mesa-dev`. This will install all the required packages in OpenUVR.
 6. You will need to apply the `bgr0_ffmpeg.patch` to add support for CUDA encoding in RGBA format, which is supported by NVIDIA but not FFMPEG by default. Enter the `FFmpeg/` directory, run `git apply ../bgr0_ffmpeg.patch` to apply the patch, then leave that directory.
 7. CUDA encoding relies on the dependency `ffnvcodec`, which can be installed with these steps:
    1. `git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git`

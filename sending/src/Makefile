@@ -10,21 +10,13 @@ all: libopenuvr.so libopenuvr.a
 
 
 ifdef MODE_MEASURE_SSIM
-OBJS+= ssim_dummy_net.o 
-#ssim_plugin.o
+OBJS+= ssim_dummy_net.o ssim_plugin.o
 CFLAGS+= -DMEASURE_SSIM
 	
 # auto-generated c source code to run python
 ssim_plugin.c: ssim_plugin_builder.py ssim_plugin_src.py ssim_plugin.h
 	python3 ssim_plugin_builder.py
 endif
-
-<<<<<<< HEAD
-.PHONY: all
-all: libopenuvr.so libopenuvr.a 
-#ssim_plugin.c
-=======
->>>>>>> f2819dcfe129e3aff049b4ce03acfd3d10bc61cc
 
 libopenuvr.so: $(OBJS)
 	gcc -shared -L../ffmpeg_build/lib/ -Wl,--no-as-needed -lavcodec -lavfilter -lavformat -lavutil -lswresample -lswscale -lavdevice -o libopenuvr.so $(OBJS)

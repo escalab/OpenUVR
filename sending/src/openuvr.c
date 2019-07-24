@@ -20,9 +20,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include <stdbool.h>
+#include <signal.h>
 
 #include <sys/time.h>
 #include <time.h>
+
+// bool initialized = false;
 
 typedef struct pthread_context
 {
@@ -93,11 +97,12 @@ struct openuvr_context *openuvr_alloc_context(enum OPENUVR_ENCODER_TYPE enc_type
 
     ctx->packet = ouvr_packet_alloc();
 
-    //receive_input_loop_start();
+    receive_input_loop_start();
     ctx->flag_send_iframe = 0;
     feedback_initialize(ctx);
 
     ret->priv = ctx;
+
     return ret;
 
 err:

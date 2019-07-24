@@ -54,7 +54,7 @@ static int udp_initialize(struct ouvr_ctx *ctx)
 
     if (bind(c->fd, (struct sockaddr *)&c->serv_addr, sizeof(c->serv_addr)) < 0)
     {
-        PRINT_ERR("Couldn't bind udp\n");
+        PRINT_ERR("Couldn't bind udp.\n");
         return -1;
     }
     if (connect(c->fd, (struct sockaddr *)&c->cli_addr, sizeof(c->cli_addr)) < 0)

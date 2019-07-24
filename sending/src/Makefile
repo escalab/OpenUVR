@@ -3,12 +3,14 @@ CFLAGS=-std=c11 -fPIC -Wall -Wextra -D_GNU_SOURCE=1 -O3 -I$(shell pwd)/../ffmpeg
 OBJS=ouvr_packet.o tcp.o udp.o udp_compat.o raw.o raw_ring.o inject.o ffmpeg_encode.o ffmpeg_cuda_encode.o rgb_encode.o pulse_audio.o openuvr.o openuvr_managed.o feedback_net.o input_recv.o
 
 ifdef MODE_MEASURE_SSIM
-OBJS+= ssim_dummy_net.o ssim_plugin.o
+OBJS+= ssim_dummy_net.o 
+#ssim_plugin.o
 CFLAGS+= -DMEASURE_SSIM
 endif
 
 .PHONY: all
-all: libopenuvr.so libopenuvr.a ssim_plugin.c
+all: libopenuvr.so libopenuvr.a 
+#ssim_plugin.c
 
 libopenuvr.so: $(OBJS)
 	gcc -shared -L../ffmpeg_build/lib/ -Wl,--no-as-needed -lavcodec -lavfilter -lavformat -lavutil -lswresample -lswscale -lavdevice -o libopenuvr.so $(OBJS)

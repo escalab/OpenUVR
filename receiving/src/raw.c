@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <signal.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -25,7 +26,7 @@ typedef struct raw_net_context
     struct iovec iov[3];
 } raw_net_context;
 
-unsigned char const global_eth_header[14] = {0xb8, 0x27, 0xeb, 0x6c, 0xa7, 0xdd, 0x00, 0x0e, 0x8e, 0x5c, 0x2e, 0x53, 0x88, 0xb5};
+unsigned char const global_eth_header[14] = {0x9c, 0xda, 0x3e, 0xa3, 0xd8, 0x29, 0xb8, 0x27, 0xeb, 0xce, 0x97, 0x68, 0x88, 0xb5};
 
 static int raw_initialize(struct ouvr_ctx *ctx)
 {

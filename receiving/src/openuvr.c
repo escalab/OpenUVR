@@ -87,7 +87,7 @@ struct openuvr_context *openuvr_alloc_context(enum OPENUVR_DECODER_TYPE dec_type
         ctx->packets[i] = ouvr_packet_alloc();
     }
 
-   // send_input_loop_start();
+    send_input_loop_start();
     ctx->flag_send_iframe = 1;
     
     if(feedback_initialize(ctx) != 0)

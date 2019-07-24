@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <signal.h>
 
 #include <bcm_host.h>
 
@@ -42,8 +43,21 @@ static int start_times[NUM_BUFS] = {0};
 
 static struct timespec sleep_time = {.tv_sec = 0, .tv_nsec = 100000000};
 
+//static FILE *file;
+
+//void abort_handler(int signal_number)
+//{
+//    fclose(	file);
+//    printf("Failed gracefully.");
+//    exit(0);
+//}
+
+
 static int omxr_initialize(struct ouvr_ctx *ctx)
 {
+    //signal(SIGINT, abort_handler);
+
+    //file = fopen("receiving.log", "w");
     // pthread_mutex_init(&decode_lock, NULL);
     // pthread_cond_init(&decode_cond, NULL);
     sem_init(&decode_sem, 0, NUM_BUFS - 1);
@@ -178,7 +192,7 @@ static int omxr_initialize(struct ouvr_ctx *ctx)
     configDisplay.alpha = 255;
     configDisplay.num = 0;
     configDisplay.layer = 0;
-    configDisplay.transform = OMX_DISPLAY_MIRROR_ROT180;
+    configDisplay.transform = OMX_DISPLAY_ROT0;
     err = OMX_SetConfig(video_render, OMX_IndexConfigDisplayRegion, &configDisplay);
     if(err != OMX_ErrorNone)
     {
@@ -206,7 +220,7 @@ static int omxr_initialize(struct ouvr_ctx *ctx)
         configDisplay.dest_rect.width      = 960;
         configDisplay.dest_rect.height     = 540;
 
-        configDisplay.fullscreen = OMX_TRUE;
+        configDisplay.fullscreen = OMX_FALSE;
 
         configDisplay.pixel_x = 1;
         configDisplay.pixel_y = 1;
@@ -340,7 +354,6 @@ static OMX_ERRORTYPE event_handler_callback(
     //printf("Event handler callback %x %d\n", nData1, nData2);
     return OMX_ErrorNone;
 }
-
 #ifdef TIME_DECODING
 float avg_dec_time = 0;
 #endif
@@ -358,6 +371,7 @@ static OMX_ERRORTYPE empty_buffer_done_callback(OMX_HANDLETYPE hComponent, OMX_P
         if(elapsed < 0) elapsed += 1000000;
             avg_dec_time = 0.998 * avg_dec_time + 0.002 * elapsed;
         printf("\r\033[60Cdec avg: %f, actual: %d", avg_dec_time, elapsed);
+	//fprintf(file, "dec avg: %f, actual: %d\n", avg_dec_time, elapsed); 
         start_times[idx] = 0;
     }
 #endif

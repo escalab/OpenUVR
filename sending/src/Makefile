@@ -1,6 +1,6 @@
 CFLAGS=-std=c11 -fPIC -Wall -Wextra -D_GNU_SOURCE=1 -O3 -I$(shell pwd)/../ffmpeg_build -I$(shell pwd)/../ffmpeg_build/include -I/usr/local/cuda/include -I/usr/include/python3.5m $(TIME_FLAGS)
 
-OBJS=ouvr_packet.o tcp.o udp.o udp_compat.o raw.o raw_ring.o inject.o rtt_measure_net.o ffmpeg_encode.o ffmpeg_cuda_encode.o rgb_encode.o openuvr.o openuvr_managed.o feedback_net.o input_recv.o
+OBJS=ouvr_packet.o tcp.o udp.o udp_compat.o raw.o raw_ring.o inject.o ffmpeg_encode.o ffmpeg_cuda_encode.o rgb_encode.o openuvr.o openuvr_managed.o feedback_net.o input_recv.o
 
 # required for pulse audio, but doesn't work with unity. TODO find a nice way to fix this so that we can uncomment it
 #OBJS+= pulse_audio.o

@@ -1,4 +1,4 @@
-NY: all
+.PHONY: all
 all:
 	@$(MAKE) -C src/ all
 

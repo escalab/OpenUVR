@@ -88,6 +88,7 @@ static void *send_input_loop(void *arg)
 		if (poll(&sensor_poll, 1, 1000) == 1)
 		{
 			recvmsg(sensor_fd, &sensor_msg, 0);
+			printf("%.3f, %.3f, %.3f, %ld\n", sensor.gyro_x, sensor.gyro_y, sensor.gyro_z, sensor.tv_nsec);
 			sendmsg(sensor_send_fd, &sensor_msg, 0);
 		}
 	} while(1);

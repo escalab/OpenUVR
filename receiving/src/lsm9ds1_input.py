@@ -14,13 +14,6 @@ from _thread import *
 import threading
 import struct
 
-# 3D Visualization
-# import visualization
-# import pygame
-# from pygame.locals import *
-# from OpenGL.GL import *
-# from OpenGL.GLU import *
-
 print_lock = threading.Lock()
 
 ADDR = "/tmp/openuvr_hmd_input_socket"
@@ -33,20 +26,6 @@ server.listen(5)
 
 i2c = busio.I2C(board.SCL, board.SDA)		# Connect sensors via I2C
 sensor = adafruit_lsm9ds1.LSM9DS1_I2C(i2c)	# Identify sensor as Adafruit LSM9DS1
-
-# Get Realtime Clock
-import ctypes
-
-class timespec(ctypes.Structure):
-    _fields_ = [
-        ('tv_sec', ctypes.c_long),
-        ('tv_nsec', ctypes.c_long)
-    ]
-
-librt = ctypes.CDLL('librt.so.1', use_errno=True)
-clock_gettime = librt.clock_gettime
-clock_gettime.argtypes = [ctypes.c_int, ctypes.POINTER(timespec)]
-realtime = timespec()
 
 def euler_to_quaternion(yaw, pitch, roll):
     cy = math.cos(yaw * 0.5)
@@ -88,26 +67,16 @@ def data_thread(conn):
                     print("server reconnecting...")
                     time.sleep(1)
 
+        # Orientation Calculation (can be later used if a player's orientation can be set, instead of being controlled by a joystick or mouse of which orientation cannot be set to specific values.)
+        
         # pitch = math.atan2(accel_y, accel_z) * 180/math.pi
         # roll = math.atan2(accel_x, accel_z) * 180/math.pi
 
         # x_flat = mag_x*math.cos(pitch) + mag_y*math.sin(pitch)*math.sin(roll) + mag_z*math.sin(pitch)*math.cos(roll)
         # y_flat = mag_y*math.cos(roll) + mag_z*math.sin(roll)
         # yaw = math.atan2(-y_flat, x_flat) * 180/math.pi
-
-        # print("{0:.3f}, {1:.3f}, {2:.3f}".format(gyro_x, gyro_y, gyro_z))
-
-        clock_gettime(0, ctypes.pointer(realtime))
+        
         conn.send(struct.pack('<3fl', gyro_x, gyro_y, gyro_z, realtime.tv_nsec)) # Little Endian Byte Order ("<")
-
-        # glRotatef(gyro_x, 1, 0, 0)
-        # glRotatef(gyro_y, 0, 1, 0)
-        # glRotatef(gyro_z, 0, 0, 1)
-
-        # glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
-        # visualization.Cube()
-        # pygame.display.flip()
-        # pygame.time.wait(10)
 
         # time.sleep(0.01)
 

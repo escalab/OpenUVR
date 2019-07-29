@@ -207,7 +207,7 @@ static int omxr_initialize(struct ouvr_ctx *ctx)
         configDisplay.dest_rect.width      = 960;
         configDisplay.dest_rect.height     = 540;
 
-        configDisplay.fullscreen = OMX_FALSE;
+        configDisplay.fullscreen = OMX_TRUE;
 
         configDisplay.pixel_x = 1;
         configDisplay.pixel_y = 1;

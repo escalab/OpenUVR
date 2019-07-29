@@ -6,6 +6,7 @@
 // Socket
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/time.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <poll.h>
@@ -19,25 +20,21 @@
 int sensor_fd;
 int sensor_send_fd;
 
-struct sensor_data
+struct SensorData
 {
-	// float accel_x;
-	// float accel_y;
-	// float accel_z;
-
 	float gyro_x;
 	float gyro_y;
 	float gyro_z;
-
-	// float mag_x;
-	// float mag_y;
-	// float mag_z;
+	long tv_nsec;
 };
 
+static struct SensorData sensor;
 static struct pollfd sensor_poll;
-static struct sensor_data sensor;
 static struct msghdr sensor_msg = {0};
 static struct iovec sensor_iov;
+
+static struct msghdr input_msg = {0};
+static struct iovec input_iov;
 
 static void setup_sensor_file_descriptors()
 {
@@ -54,13 +51,13 @@ static void setup_sensor_file_descriptors()
 
 	connect(sensor_fd, (struct sockaddr *) &sensor_addr, sizeof(sensor_addr));
 
-	sensor_iov.iov_len = sizeof(struct sensor_data);
+	sensor_iov.iov_len = sizeof(struct SensorData);
 	sensor_iov.iov_base = &sensor;
 	sensor_msg.msg_iov = &sensor_iov;
 	sensor_msg.msg_iovlen = 1;
 	sensor_poll.fd = sensor_fd;
 	sensor_poll.events = POLLIN;
-	
+
 	sensor_send_fd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sensor_send_fd < 0)
 	{

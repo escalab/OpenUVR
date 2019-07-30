@@ -25,7 +25,6 @@ struct SensorData
     float gyro_x;
     float gyro_y;
     float gyro_z;
-    long tv_nsec;
 };
 
 int sensor_recv_fd, input_fd;
@@ -94,6 +93,7 @@ static void create_virtual_input()
 	ioctl(input_fd, UI_SET_RELBIT, REL_Y);		// Vertical Motion
 
 	// Create Virtual Keyboard
+	/*
 	ioctl(input_fd, UI_SET_EVBIT, EV_KEY);
 	ioctl(input_fd, UI_SET_KEYBIT, KEY_SPACE);	// Up
 	ioctl(input_fd, UI_SET_KEYBIT, KEY_LEFTCTRL);	// Down
@@ -101,6 +101,7 @@ static void create_virtual_input()
 	ioctl(input_fd, UI_SET_KEYBIT, KEY_A);		// Left
 	ioctl(input_fd, UI_SET_KEYBIT, KEY_S);		// Backward
 	ioctl(input_fd, UI_SET_KEYBIT, KEY_D);		// Right
+	*/
 
 	// Create Virtual Thumbstick
 	// ioctl(input_fd, UI_SET_EVBIT, EV_ABS);
@@ -164,10 +165,9 @@ static void *receive_input_loop(void *arg)
     {
         recvmsg(sensor_recv_fd, &sensor_msg, 0);
 
-	printf("%.3f, %.3f, %.3f, %ld\n", sensor_data.gyro_x, sensor_data.gyro_y, sensor_data.gyro_z, sensor_data.tv_nsec);
-
-	input_control(input_fd, EV_REL, REL_X, sensor_data.gyro_y*0.05);
-	input_control(input_fd, EV_REL, REL_Y, sensor_data.gyro_x*-0.05);
+	// Hard-coded factors (because direct manipulation of game control mechanism would make the project less adaptable to other scenarios)
+	input_control(input_fd, EV_REL, REL_X, sensor_data.gyro_y*0.075);
+	input_control(input_fd, EV_REL, REL_Y, sensor_data.gyro_x*-0.075);
 
 	input_control(input_fd, EV_SYN, SYN_REPORT, 0);
     } while (1);

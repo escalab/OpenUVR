@@ -76,7 +76,7 @@ def data_thread(conn):
         # y_flat = mag_y*math.cos(roll) + mag_z*math.sin(roll)
         # yaw = math.atan2(-y_flat, x_flat) * 180/math.pi
         
-        conn.send(struct.pack('<3fl', gyro_x, gyro_y, gyro_z, realtime.tv_nsec)) # Little Endian Byte Order ("<")
+        conn.send(struct.pack('<3f', gyro_x, gyro_y, gyro_z)) # Little Endian Byte Order ("<")
 
         # time.sleep(0.01)
 

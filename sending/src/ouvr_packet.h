@@ -10,12 +10,15 @@ struct ouvr_ctx;
 // #define CLIENT_IP "172.16.44.23"
 
 #define SERVER_IP "192.168.1.2"
-#define CLIENT_IP "192.168.1.3"
+//#define CLIENT_IP "192.168.1.3"
 
 #include <stdio.h>
 #include <stdint.h>
 
 #define PRINT_ERR(format, ...) fprintf(stderr, "\33[31;4mOpenUVR Error:%s:%d:\033[24m " format "\033[0m", __FILE__, __LINE__, ##__VA_ARGS__)
+
+char CLIENT_IP[20];
+
 
 struct ouvr_packet
 {

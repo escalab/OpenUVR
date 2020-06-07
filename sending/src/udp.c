@@ -16,10 +16,14 @@
 // #define SERVER_IP 0xc0a80102
 // #define CLIENT_IP 0xc0a80103
 
-#define SERVER_PORT_BUFFER 21221
-#define CLIENT_PORT_BUFFER 21222
+//#define SERVER_PORT_BUFFER 21221
+//#define CLIENT_PORT_BUFFER 21222
+
+
 
 #define SEND_SIZE 1450
+
+extern char CLIENT_IP[20];
 
 typedef struct udp_net_context
 {
@@ -43,6 +47,18 @@ static int udp_initialize(struct ouvr_ctx *ctx)
         PRINT_ERR("Couldn't create udp socket\n");
         return -1;
     }
+
+    int SERVER_PORT_BUFFER;
+    int CLIENT_PORT_BUFFER;
+
+    printf("Enter the server port buffer:\n");
+    scanf("%d",&SERVER_PORT_BUFFER);
+    printf("Enter the client port buffer:\n");
+    scanf("%d",&CLIENT_PORT_BUFFER);
+
+    printf("Enter the client IP\n");
+    scanf("%s",CLIENT_IP);
+
 
     c->serv_addr.sin_family = AF_INET;
     inet_pton(AF_INET, SERVER_IP, &c->serv_addr.sin_addr.s_addr); //c->serv_addr.sin_addr.s_addr = htonl(SERVER_IP);

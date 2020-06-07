@@ -19,8 +19,11 @@
 // #define SERVER_IP 0xc0a80102
 // #define CLIENT_IP 0xc0a80103
 
-#define SERVER_PORT_FEEDBACK 21223
-#define CLIENT_PORT_FEEDBACK 21224
+//#define SERVER_PORT_FEEDBACK 21223
+//#define CLIENT_PORT_FEEDBACK 21224
+
+extern char CLIENT_IP[20];
+
 
 typedef struct feedback_net_context
 {
@@ -41,6 +44,16 @@ int feedback_initialize(struct ouvr_ctx *ctx)
         PRINT_ERR("Couldn't create socket\n");
         return -1;
     }
+
+    int SERVER_PORT_FEEDBACK;
+    int CLIENT_PORT_FEEDBACK;
+
+    printf("Enter the server feedback port:\n");
+    scanf("%d",&SERVER_PORT_FEEDBACK);
+    printf("Enter the client feedback port:\n");
+    scanf("%d",&CLIENT_PORT_FEEDBACK);
+
+
 
     c->serv_addr.sin_family = AF_INET;
     inet_pton(AF_INET, SERVER_IP, &c->serv_addr.sin_addr.s_addr);

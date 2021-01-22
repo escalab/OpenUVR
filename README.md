@@ -133,4 +133,4 @@ The entire orientation system works as such: Inside `input_send.c`, two threads 
 
 ## Reference Paper
 
-Alec Rohloff, Zackary Allen, Kung-Min Lin, Joshua Okrend, Chengyi Nie, Yu-Chia Liu, and Hung-Wei Tseng. OpenUVR: Reducing Latency and Preserving Quality in Untethered Real-Time Virtual-Reality Gaming Platforms. In 27th IEEE Real-Time and Embedded Technology and Applications Symposium, RTAS 2021, 2021. 
+Alec Rohloff, Zackary Allen, Kung-Min Lin, Joshua Okrend, Chengyi Nie, Yu-Chia Liu, and Hung-Wei Tseng. OpenUVR: an Open-Source System Framework for Untethered Virtual Reality Applications. In 27th IEEE Real-Time and Embedded Technology and Applications Symposium, RTAS 2021, 2021. 

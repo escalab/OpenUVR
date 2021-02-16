@@ -72,9 +72,12 @@ RUN	codecs="libass-dev \
 
 RUN	make ffmpeg
 
-RUN	git clone git@github.com:EpicGames/UnrealTournament.git /UnrealTournament
+RUN	git config --global core.compression 0 && \
+	git clone --depth 1 git@github.com:EpicGames/UnrealTournament.git /UnrealTournament
 WORKDIR	/UnrealTournament
-RUN	apt-get install -yq --no-install-recommends mono-mcs && \
+RUN	git fetch --unshallow && \
+	git pull --all && \
+	apt-get install -yq --no-install-recommends mono-dmcs mono-mcs && \
 	./Setup.sh && \
 	./GenerateProjectFiles.sh && \
 	make

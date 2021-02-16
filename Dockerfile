@@ -42,8 +42,9 @@ COPY	. /OpenUVR
 WORKDIR /OpenUVR/sending
 
 RUN	mkdir /root/.ssh
-COPY	id_rsa /root/.ssh/id_rsa
-RUN	touch /root/.ssh/known_hosts && \
+COPY	id_rsa /root/.ssh/
+RUN	chmod 600 /root/.ssh/id_rsa && \
+	touch /root/.ssh/known_hosts && \
 	ssh-keyscan github.com >> /root/.ssh/known_hosts && \
 	git submodule init && git submodule update && \
 	git apply /OpenUVR/sending/bgr0_ffmpeg.patch

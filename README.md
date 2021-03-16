@@ -118,7 +118,9 @@ Now that Quake 3 is installed, you can run it using `sudo LD_LIBRARY_PATH=/your/
 4. Compile the standalone `openuvr` program with `make`.
 
 ## Running on the Raspberry Pi (receiving side)
-Run the program with `sudo ./openuvr <encoding_type> <network_type>`.\
+Before running the openuvr program, you should assign an IP address to the RPi. https://github.com/escalab/OpenUVR/blob/master/receiving/assign_ip.sh provides a sample regarding how to set up the RPI with a default IP of 192.168.1.3.
+
+Then you can run the program with `sudo ./openuvr <encoding_type> <network_type>` within the `OpenUVR/receiving/src` directory.\
 `<encoding type>` can be one of `h264` or `rgb`, but it will likely always be `h264` for your purposes.
 `<network_type>` can be one of `raw`, `udp`, `udp_compat`, or `tcp`. Whatever is chosen, it must match the protocol used on the sending side. `tcp` should not be used except for testing purposes. `udp_compat` is used when the sending side is some program other than OpenUVR which sends frames using UDP (for example the ffmpeg executable). `raw` is the optimal choice (measured around 1% faster than UDP, but further optimizations can possibly improve this).
 

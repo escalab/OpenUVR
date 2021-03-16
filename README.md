@@ -113,7 +113,7 @@ Now that Quake 3 is installed, you can run it using `sudo LD_LIBRARY_PATH=/your/
 
 ## Compiling on the Raspberry Pi (receiving side)
 1. Clone the `OpenUVR` repository anywhere in your home directory on the Raspberry Pi.
-2. Enter the `OpenUVR/receiving` directory.
+2. Enter the `OpenUVR/receiving/src` directory.
 3. `sudo apt-get install libavcodec-dev`
 4. Compile the standalone `openuvr` program with `make`.
 

@@ -23,6 +23,11 @@ FFmpeg is included in OpenUVR as a git submodule. It is set to track version 4.0
 This will install static and shared libraries to the `OpenUVR/sending/ffmpeg_build/lib` directory. IOQuake3 will need to be compiled with these libraries, and they must be specified when running it. This will be described below in `Compiling IOQuake3`.
 
 ### Compiling OpenUVR
+
+#### Prepartion
+Please modify https://github.com/escalab/OpenUVR/blob/master/sending/src/raw.c#L63 to reflect the host/MUD's MAC addresses if you want to use RAW socket mode. The first 6 hex number in global_eth_header should come from the MUD's side. The following 6 represents the host's MAC address. The last two hex numbers remain unchanged.
+
+#### Compiliation
 From the `OpenUVR/sending/` directory, run `make` to compile the OpenUVR shared libraries and use `sudo make install` to install them. This places the `openuvr.h` header file into `/usr/local/include/openuvr/` and it places `libopenuvr.so` into `/usr/local/lib/`.
 
 `OpenUVR` can be compiled to output the moving average of recent timings. To compile it to output the average encoding time (i.e. the time elapsed from starting to send the RGB bytes to FFmpeg until receiving the encoded frame from FFmpeg), use `make TIME_FLAGS=-DTIME_ENCODING`. To have it output the average network time, use `make TIME_FLAGS=-DTIME_NETWORK`. To do both, do `make TIME_FLAGS="-DTIME_NETWORK -DTIME_ENCODING"`
@@ -117,7 +122,8 @@ Now that Quake 3 is installed, you can run it using `sudo LD_LIBRARY_PATH=/your/
 1. Clone the `OpenUVR` repository anywhere in your home directory on the Raspberry Pi.
 2. Enter the `OpenUVR/receiving/src` directory.
 3. `sudo apt-get install libavcodec-dev`
-4. Compile the standalone `openuvr` program with `make`.
+4. Please modify https://github.com/escalab/OpenUVR/blob/master/receiving/src/raw.c#L59 to reflect the host/MUD's MAC addresses if you want to use RAW socket mode. The first 6 hex number in global_eth_header should come from the host side. The following 6 represents the MUD's MAC address. The last two hex numbers remain unchanged.
+5. Compile the standalone `openuvr` program with `make`.
 
 ## Running on the Raspberry Pi (receiving side)
 Before running the openuvr program, you should assign an IP address to the RPi. https://github.com/escalab/OpenUVR/blob/master/receiving/assign_ip.sh provides a sample regarding how to set up the RPI with a default IP of 192.168.1.3.
